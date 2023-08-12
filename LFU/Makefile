@@ -1,7 +1,11 @@
 
 MAIN=main.cpp
-LFU=lfu.cpp
-
+CXX=g++
+CFLAGS=-Wall
 
 all:
-	g++ main.cpp lfu.cpp -o main
+	$(CXX) $(CFLAGS) $(MAIN) -o main
+
+clear:
+	rm -f main
+	rm -f ./*.o
