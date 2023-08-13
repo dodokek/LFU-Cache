@@ -17,7 +17,8 @@ class LFU {
 
 private:
     size_t capacity_;
-
+    long long hit_counter = 0;
+    
     struct lfu_elem
     {
         PageT  page;
@@ -28,7 +29,8 @@ private:
     std::vector<lfu_elem> cache_;
     
 
-public:    
+public:
+
     LFU (size_t capacity) : capacity_(capacity) {}
 
     // Lookup for elem in cache. In case of miss - add new elem and 
@@ -39,15 +41,13 @@ public:
         
         if (elem_id == NOT_FOUND){
             if (IsFull()){
-                std::cout << "List is full, replacing element:\n";
                 SearchAndReplace(key);
             } else {
-                std::cout << "New element, adding to the end of vector\n";
                 PushBackElem(key);
             }
         } else {
-            std::cout << "Hit!\n";
             cache_[elem_id].hit_count++;
+            hit_counter++;
         }
 
         return true;
@@ -55,12 +55,11 @@ public:
 
     void SearchAndReplace (KeyT key)
     {
-        size_t min_hits     = MAX_HIT_COUNTS;
+        size_t min_hits  = MAX_HIT_COUNTS;
         size_t min_index = NOT_FOUND;
 
         // Search in whole vector, because we 100% sure, that it's full.
-        for (size_t i = 0; i < capacity_; i++)
-        {
+        for (size_t i = 0; i < capacity_; i++){
             if (cache_[i].hit_count < min_hits){
                 min_hits = cache_[i].hit_count;
                 min_index = i;
@@ -75,8 +74,6 @@ public:
         };
 
         cache_[min_index] = tmp_elem;
-
-        std::cout << "Id: " << min_index << " Value: " << key << "\n";
     }
 
     // Find element in cache_
@@ -104,6 +101,12 @@ public:
         cache_.push_back(tmp_elem);    
     }
 
+
+    void ShowHitcountInfo (){
+        std::cout << "Total hits: " << hit_counter << "\n";
+    }
+
+
     void Dump (){
         std::cout << "------- Dump of Class: LFU -------\n";
         std::cout << "Capacity: " << capacity_     << "\n";
@@ -121,6 +124,5 @@ public:
 }; 
 
 };
-
 
 #endif

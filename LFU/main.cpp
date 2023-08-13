@@ -20,8 +20,8 @@ int main()
         std::cin >> new_elem;
 
         lfu_instance.LookupAndHandle(new_elem);
-        lfu_instance.Dump();
+        // lfu_instance.Dump();
     }
 
-
+    lfu_instance.ShowHitcountInfo();
 }
