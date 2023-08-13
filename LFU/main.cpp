@@ -12,7 +12,7 @@ int main()
 
     std::cin >> cache_capactiy >> input_size;
 
-    LFU_DODO::LFU<int, int> lfu_instance(cache_capactiy);
+    LFU_CACHE::LFU<int, int> lfu_instance(cache_capactiy);
 
     for (size_t i = 0 ; i < input_size; i++)
     {

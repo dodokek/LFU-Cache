@@ -2,36 +2,58 @@
 #define LFU_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <vector>
+#include <array>
 #include <iostream>
+#include <limits.h>
+#include <stdint.h>
 
-
-namespace LFU_DODO
+namespace LFU_CACHE
 {
 
-const size_t NOT_FOUND       = -1;
-const size_t MAX_HIT_COUNTS  = 10000;
+const uint32_t NOT_FOUND       = -1;
+const uint32_t MAX_HIT_COUNTS  = UINT32_MAX;
 
-template<typename PageT, typename KeyT>
+enum FIND_STATE
+{
+    HIT     = true,
+    NOT_HIT = false
+};
+
+
+template<typename PageT, typename KeyT, int ArraySize>
 class LFU {
 
 private:
-    size_t capacity_;
-    long long hit_counter = 0;
+    const size_t capacity_;
+    uint64_t     total_hit_count_ = 0;
     
-    struct lfu_elem
+    struct LFU_ELEM
     {
-        PageT  page;
-        KeyT   key;
-        size_t hit_count;
+        PageT    page;
+        KeyT     key;
+        uint64_t hit_count;
     };
 
-    std::vector<lfu_elem> cache_;
-    
+    std::vector<LFU_ELEM> cache_;
+
+    // Add new element to the end of vector 
+    void PushBackElem (KeyT key){
+        LFU_ELEM tmp_elem = {
+            .key = key,
+            .hit_count = 0
+        };
+
+        cache_.push_back(tmp_elem);    
+    }
 
 public:
 
-    LFU (size_t capacity) : capacity_(capacity) {}
+    LFU (size_t capacity) : capacity_(capacity) {
+        cache_.reserve(capacity);
+    }
+    ~LFU () {}
 
     // Lookup for elem in cache. In case of miss - add new elem and 
     // replace least used elem with new one if needed.
@@ -40,17 +62,17 @@ public:
         size_t elem_id = FindElem(key); 
         
         if (elem_id == NOT_FOUND){
-            if (IsFull()){
+            if (IsFull())
                 SearchAndReplace(key);
-            } else {
+            else
                 PushBackElem(key);
-            }
+            return NOT_HIT;
         } else {
             cache_[elem_id].hit_count++;
-            hit_counter++;
+            total_hit_count_++;
+            
+            return HIT;
         }
-
-        return true;
     }
 
     void SearchAndReplace (KeyT key)
@@ -67,9 +89,9 @@ public:
         }
 
         if (min_index == NOT_FOUND)
-            std::cout << "Error in Search during replace attempt\n";
+            std::cerr << "Error in Search during replace attempt\n";
 
-        lfu_elem tmp_elem = {
+        LFU_ELEM tmp_elem = {
             .key = key 
         };
 
@@ -91,19 +113,9 @@ public:
         return capacity_ == cache_.size();
     } 
 
-    // Add new element to the end of 
-    void PushBackElem (KeyT key){
-        lfu_elem tmp_elem = {
-            .key = key,
-            .hit_count = 0
-        };
-
-        cache_.push_back(tmp_elem);    
-    }
-
 
     void ShowHitcountInfo (){
-        std::cout << "Total hits: " << hit_counter << "\n";
+        std::cout << "Total hits: " << total_hit_count_ << "\n";
     }
 
 
