@@ -99,7 +99,7 @@ public:
     }
 
     // Find element in cache_
-    size_t FindElem (KeyT key){
+    size_t FindElem (KeyT key) const {
         for (size_t i = 0; i < cache_.size(); i++){
             if (cache_[i].key == key)
                 return i;
@@ -109,17 +109,17 @@ public:
     }
 
     // Checks if cache can't fit more elems inside
-    bool IsFull (){
+    bool IsFull () const {
         return capacity_ == cache_.size();
     } 
 
 
-    void ShowHitcountInfo (){
-        std::cout << "Total hits: " << total_hit_count_ << "\n";
+    uint64_t GetHitcountInfo () const {
+        return total_hit_count_;
     }
 
 
-    void Dump (){
+    void Dump () const {
         std::cout << "------- Dump of Class: LFU -------\n";
         std::cout << "Capacity: " << capacity_     << "\n";
         std::cout << "Size: "     << cache_.size() << "\n";
