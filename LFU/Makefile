@@ -2,9 +2,11 @@
 MAIN=main.cpp
 CXX=g++
 CFLAGS=-Wall
+IFLAGS=-I./include/
+
 
 all:
-	$(CXX) $(CFLAGS) $(MAIN) -o main
+	$(CXX) $(IFLAGS) $(CFLAGS) $(MAIN) -o main
 
 clear:
 	rm -f main

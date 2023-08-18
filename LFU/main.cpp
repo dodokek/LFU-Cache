@@ -1,9 +1,8 @@
-
 #include <cstddef>
 #include <iostream>
 
+#include "LFU.hpp"
 #include "include/LFU.hpp"
-
 
 int main()
 {
@@ -11,6 +10,10 @@ int main()
     size_t input_size = 0;
 
     std::cin >> cache_capactiy >> input_size;
+    
+DBG (if (!std::cin.good())
+        std::cerr << "Bad input\n";
+    ) 
 
     LFU_CACHE::LFU<int, int> lfu_instance(cache_capactiy);
 
@@ -19,9 +22,14 @@ int main()
         int new_elem = 0;
         std::cin >> new_elem;
 
+    DBG (
+        if (!std::cin.good())
+            std::cerr << "Bad input\n";
+        )
+
         lfu_instance.LookupAndHandle(new_elem);
         // lfu_instance.Dump();
     }
 
-    lfu_instance.ShowHitcountInfo();
+    std::cout << "Total hits: " << lfu_instance.GetHitcountInfo() << "\n";
 }

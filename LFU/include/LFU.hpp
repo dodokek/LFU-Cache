@@ -9,24 +9,30 @@
 #include <limits.h>
 #include <stdint.h>
 
+#define DEBUG
+#ifdef DEBUG
+    #define DBG(X) X
+#else
+    #define DBG(X) ;
+#endif
+
+
 namespace LFU_CACHE
 {
 
-const uint32_t NOT_FOUND       = -1;
-const uint32_t MAX_HIT_COUNTS  = UINT32_MAX;
-
 enum FIND_STATE
 {
-    HIT     = true,
-    NOT_HIT = false
+    HIT,
+    NOT_HIT
 };
 
 
-template<typename PageT, typename KeyT, int ArraySize>
+template<typename PageT, typename KeyT>
 class LFU {
+    static const size_t NOT_FOUND       = 0xDEADBEEF;
+    static const size_t MAX_HIT_COUNTS  = UINT32_MAX;
 
-private:
-    const size_t capacity_;
+    size_t capacity_;
     uint64_t     total_hit_count_ = 0;
     
     struct LFU_ELEM
@@ -36,46 +42,11 @@ private:
         uint64_t hit_count;
     };
 
+    using size_type = typename std::vector<LFU_ELEM>::size_type;
+
     std::vector<LFU_ELEM> cache_;
 
-    // Add new element to the end of vector 
-    void PushBackElem (KeyT key){
-        LFU_ELEM tmp_elem = {
-            .key = key,
-            .hit_count = 0
-        };
-
-        cache_.push_back(tmp_elem);    
-    }
-
-public:
-
-    LFU (size_t capacity) : capacity_(capacity) {
-        cache_.reserve(capacity);
-    }
-    ~LFU () {}
-
-    // Lookup for elem in cache. In case of miss - add new elem and 
-    // replace least used elem with new one if needed.
-    bool LookupAndHandle (KeyT key){
-        
-        size_t elem_id = FindElem(key); 
-        
-        if (elem_id == NOT_FOUND){
-            if (IsFull())
-                SearchAndReplace(key);
-            else
-                PushBackElem(key);
-            return NOT_HIT;
-        } else {
-            cache_[elem_id].hit_count++;
-            total_hit_count_++;
-            
-            return HIT;
-        }
-    }
-
-    void SearchAndReplace (KeyT key)
+    void SearchAndReplace (KeyT& key)
     {
         size_t min_hits  = MAX_HIT_COUNTS;
         size_t min_index = NOT_FOUND;
@@ -88,9 +59,10 @@ public:
             }
         }
 
+        DBG(
         if (min_index == NOT_FOUND)
             std::cerr << "Error in Search during replace attempt\n";
-
+        )
         LFU_ELEM tmp_elem = {
             .key = key 
         };
@@ -98,14 +70,45 @@ public:
         cache_[min_index] = tmp_elem;
     }
 
+public:
+    LFU (size_t capacity) : capacity_(capacity) {
+        cache_.reserve(capacity);
+    }
+
+    // Lookup for elem in cache. In case of miss - add new elem and 
+    // replace least used elem with new one if needed.
+    bool LookupAndHandle (KeyT& key){
+        size_t elem_id = FindElem(key); 
+        
+        if (elem_id == NOT_FOUND){
+            if (IsFull())
+                SearchAndReplace(key);
+            else
+                cache_.push_back({0, key, 0});
+            return NOT_HIT;
+        } else {
+            cache_[elem_id].hit_count++;
+            total_hit_count_++;
+            
+            return HIT;
+        }
+    }
+
     // Find element in cache_
-    size_t FindElem (KeyT key) const {
+    size_t FindElem (KeyT& key) const {
         for (size_t i = 0; i < cache_.size(); i++){
             if (cache_[i].key == key)
                 return i;
         }
 
         return NOT_FOUND;
+    }
+
+    KeyT GetElementById (KeyT& key) const {
+        auto result = LookupAndHandle (key);
+        if (result == HIT)
+            return result;
+        return NULL;
     }
 
     // Checks if cache can't fit more elems inside
@@ -130,8 +133,7 @@ public:
             std::cout << i <<": Key = " << cache_[i].key << ", HitCount = " << cache_[i].hit_count << "\n";
         }
 
-        std::cout << "------- End of dump --------------\n";
-         
+        std::cout << "------- End of dump --------------\n";   
     }
 }; 
 
