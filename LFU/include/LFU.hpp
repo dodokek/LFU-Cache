@@ -9,13 +9,6 @@
 #include <limits.h>
 #include <stdint.h>
 
-#define DEBUG
-#ifdef DEBUG
-    #define DBG(X) X
-#else
-    #define DBG(X) ;
-#endif
-
 
 namespace LFU_CACHE
 {
@@ -29,27 +22,29 @@ enum FIND_STATE
 
 template<typename PageT, typename KeyT>
 class LFU {
-    static const size_t NOT_FOUND       = 0xDEADBEEF;
-    static const size_t MAX_HIT_COUNTS  = UINT32_MAX;
-
-    size_t capacity_;
-    uint64_t     total_hit_count_ = 0;
-    
     struct LFU_ELEM
     {
         PageT    page;
         KeyT     key;
         uint64_t hit_count;
     };
-
+    
     using size_type = typename std::vector<LFU_ELEM>::size_type;
+
+    static constexpr size_t NOT_FOUND       = 0xDEADBEEF;
+    static constexpr size_t MAX_HIT_COUNTS  = UINT32_MAX;
+
+    size_type capacity_;
+    long int  total_hit_count_ = 0;
+    
+
 
     std::vector<LFU_ELEM> cache_;
 
     void SearchAndReplace (KeyT& key)
     {
         size_t min_hits  = MAX_HIT_COUNTS;
-        size_t min_index = NOT_FOUND;
+        size_type min_index = NOT_FOUND;
 
         // Search in whole vector, because we 100% sure, that it's full.
         for (size_t i = 0; i < capacity_; i++){
@@ -59,10 +54,9 @@ class LFU {
             }
         }
 
-        DBG(
         if (min_index == NOT_FOUND)
             std::cerr << "Error in Search during replace attempt\n";
-        )
+        
         LFU_ELEM tmp_elem = {
             .key = key 
         };
@@ -71,14 +65,14 @@ class LFU {
     }
 
 public:
-    LFU (size_t capacity) : capacity_(capacity) {
+    LFU (size_type capacity) : capacity_(capacity) {
         cache_.reserve(capacity);
     }
 
     // Lookup for elem in cache. In case of miss - add new elem and 
     // replace least used elem with new one if needed.
     bool LookupAndHandle (KeyT& key){
-        size_t elem_id = FindElem(key); 
+        size_type elem_id = FindElem(key); 
         
         if (elem_id == NOT_FOUND){
             if (IsFull())
@@ -108,7 +102,7 @@ public:
         auto result = LookupAndHandle (key);
         if (result == HIT)
             return result;
-        return NULL;
+        return nullptr;
     }
 
     // Checks if cache can't fit more elems inside
@@ -117,7 +111,7 @@ public:
     } 
 
 
-    uint64_t GetHitcountInfo () const {
+    long int GetHitcountInfo () const {
         return total_hit_count_;
     }
 

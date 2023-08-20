@@ -11,9 +11,9 @@ int main()
 
     std::cin >> cache_capactiy >> input_size;
     
-DBG (if (!std::cin.good())
+    if (!std::cin.good())
         std::cerr << "Bad input\n";
-    ) 
+     
 
     LFU_CACHE::LFU<int, int> lfu_instance(cache_capactiy);
 
@@ -22,14 +22,12 @@ DBG (if (!std::cin.good())
         int new_elem = 0;
         std::cin >> new_elem;
 
-    DBG (
         if (!std::cin.good())
             std::cerr << "Bad input\n";
-        )
 
         lfu_instance.LookupAndHandle(new_elem);
         // lfu_instance.Dump();
     }
 
-    std::cout << "Total hits: " << lfu_instance.GetHitcountInfo() << "\n";
+    std::cout << lfu_instance.GetHitcountInfo() << "\n";
 }
