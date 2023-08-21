@@ -117,41 +117,78 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named main
+# Target rules for targets named LFU_cringe
 
 # Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main
-.PHONY : main
+LFU_cringe: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 LFU_cringe
+.PHONY : LFU_cringe
 
 # fast build rule for target.
-main/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
+LFU_cringe/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/build
+.PHONY : LFU_cringe/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+#=============================================================================
+# Target rules for targets named LFU_hashmap
+
+# Build rule for target.
+LFU_hashmap: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 LFU_hashmap
+.PHONY : LFU_hashmap
+
+# fast build rule for target.
+LFU_hashmap/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/build
+.PHONY : LFU_hashmap/fast
+
+LFU_cringe.o: LFU_cringe.cpp.o
+.PHONY : LFU_cringe.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
-.PHONY : main.cpp.o
+LFU_cringe.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/LFU_cringe.cpp.o
+.PHONY : LFU_cringe.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+LFU_cringe.i: LFU_cringe.cpp.i
+.PHONY : LFU_cringe.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
-.PHONY : main.cpp.i
+LFU_cringe.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/LFU_cringe.cpp.i
+.PHONY : LFU_cringe.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+LFU_cringe.s: LFU_cringe.cpp.s
+.PHONY : LFU_cringe.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
-.PHONY : main.cpp.s
+LFU_cringe.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/LFU_cringe.cpp.s
+.PHONY : LFU_cringe.cpp.s
+
+LFU_hashmap.o: LFU_hashmap.cpp.o
+.PHONY : LFU_hashmap.o
+
+# target to build an object file
+LFU_hashmap.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/LFU_hashmap.cpp.o
+.PHONY : LFU_hashmap.cpp.o
+
+LFU_hashmap.i: LFU_hashmap.cpp.i
+.PHONY : LFU_hashmap.i
+
+# target to preprocess a source file
+LFU_hashmap.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/LFU_hashmap.cpp.i
+.PHONY : LFU_hashmap.cpp.i
+
+LFU_hashmap.s: LFU_hashmap.cpp.s
+.PHONY : LFU_hashmap.s
+
+# target to generate assembly for a file
+LFU_hashmap.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/LFU_hashmap.cpp.s
+.PHONY : LFU_hashmap.cpp.s
 
 # Help Target
 help:
@@ -161,10 +198,14 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... main"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... LFU_cringe"
+	@echo "... LFU_hashmap"
+	@echo "... LFU_cringe.o"
+	@echo "... LFU_cringe.i"
+	@echo "... LFU_cringe.s"
+	@echo "... LFU_hashmap.o"
+	@echo "... LFU_hashmap.i"
+	@echo "... LFU_hashmap.s"
 .PHONY : help
 
 

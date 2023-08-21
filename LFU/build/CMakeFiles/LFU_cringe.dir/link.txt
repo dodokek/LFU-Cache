@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/LFU_cringe.dir/LFU_cringe.cpp.o -o LFU_cringe 

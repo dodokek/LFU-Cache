@@ -63,7 +63,8 @@ CMAKE_BINARY_DIR = /home/dodo/github/LFU-Cache/LFU/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/main.dir/all
+all: CMakeFiles/LFU_cringe.dir/all
+all: CMakeFiles/LFU_hashmap.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +72,61 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/main.dir/clean
+clean: CMakeFiles/LFU_cringe.dir/clean
+clean: CMakeFiles/LFU_hashmap.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/main.dir
+# Target rules for target CMakeFiles/LFU_cringe.dir
 
 # All Build rule for target.
-CMakeFiles/main.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dodo/github/LFU-Cache/LFU/build/CMakeFiles --progress-num=1,2 "Built target main"
-.PHONY : CMakeFiles/main.dir/all
+CMakeFiles/LFU_cringe.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dodo/github/LFU-Cache/LFU/build/CMakeFiles --progress-num=1,2 "Built target LFU_cringe"
+.PHONY : CMakeFiles/LFU_cringe.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/main.dir/rule: cmake_check_build_system
+CMakeFiles/LFU_cringe.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/dodo/github/LFU-Cache/LFU/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/LFU_cringe.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/dodo/github/LFU-Cache/LFU/build/CMakeFiles 0
-.PHONY : CMakeFiles/main.dir/rule
+.PHONY : CMakeFiles/LFU_cringe.dir/rule
 
 # Convenience name for target.
-main: CMakeFiles/main.dir/rule
-.PHONY : main
+LFU_cringe: CMakeFiles/LFU_cringe.dir/rule
+.PHONY : LFU_cringe
 
 # clean rule for target.
-CMakeFiles/main.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
-.PHONY : CMakeFiles/main.dir/clean
+CMakeFiles/LFU_cringe.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_cringe.dir/build.make CMakeFiles/LFU_cringe.dir/clean
+.PHONY : CMakeFiles/LFU_cringe.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/LFU_hashmap.dir
+
+# All Build rule for target.
+CMakeFiles/LFU_hashmap.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dodo/github/LFU-Cache/LFU/build/CMakeFiles --progress-num=3,4 "Built target LFU_hashmap"
+.PHONY : CMakeFiles/LFU_hashmap.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/LFU_hashmap.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dodo/github/LFU-Cache/LFU/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/LFU_hashmap.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dodo/github/LFU-Cache/LFU/build/CMakeFiles 0
+.PHONY : CMakeFiles/LFU_hashmap.dir/rule
+
+# Convenience name for target.
+LFU_hashmap: CMakeFiles/LFU_hashmap.dir/rule
+.PHONY : LFU_hashmap
+
+# clean rule for target.
+CMakeFiles/LFU_hashmap.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/LFU_hashmap.dir/build.make CMakeFiles/LFU_hashmap.dir/clean
+.PHONY : CMakeFiles/LFU_hashmap.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

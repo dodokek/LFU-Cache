@@ -37,8 +37,6 @@ class LFU {
     size_type capacity_;
     long int  total_hit_count_ = 0;
     
-
-
     std::vector<LFU_ELEM> cache_;
 
     void SearchAndReplace (KeyT& key)
