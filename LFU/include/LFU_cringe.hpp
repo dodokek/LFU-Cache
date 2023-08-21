@@ -21,12 +21,13 @@ enum FIND_STATE
 
 
 template<typename PageT, typename KeyT>
-class LFU {
+class LFU final {
+    
     struct LFU_ELEM
     {
         PageT    page;
         KeyT     key;
-        uint64_t hit_count;
+        long int hit_count;
     };
     
     using size_type = typename std::vector<LFU_ELEM>::size_type;
@@ -39,7 +40,7 @@ class LFU {
     
     std::vector<LFU_ELEM> cache_;
 
-    void SearchAndReplace (KeyT& key)
+    void SearchAndReplace (const KeyT& key)
     {
         size_t min_hits  = MAX_HIT_COUNTS;
         size_type min_index = NOT_FOUND;
@@ -69,7 +70,7 @@ public:
 
     // Lookup for elem in cache. In case of miss - add new elem and 
     // replace least used elem with new one if needed.
-    bool LookupAndHandle (KeyT& key){
+    bool LookupAndHandle (const KeyT& key){
         size_type elem_id = FindElem(key); 
         
         if (elem_id == NOT_FOUND){
@@ -87,7 +88,7 @@ public:
     }
 
     // Find element in cache_
-    size_t FindElem (KeyT& key) const {
+    size_t FindElem (const KeyT& key) const {
         for (size_t i = 0; i < cache_.size(); i++){
             if (cache_[i].key == key)
                 return i;
@@ -96,7 +97,7 @@ public:
         return NOT_FOUND;
     }
 
-    KeyT GetElementById (KeyT& key) const {
+    KeyT GetElementById (const KeyT& key) const {
         auto result = LookupAndHandle (key);
         if (result == HIT)
             return result;

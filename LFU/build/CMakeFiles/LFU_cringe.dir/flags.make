@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/dodo/github/LFU-Cache/LFU/./include
 
-CXX_FLAGS = -O3 -DNDEBUG
+CXX_FLAGS = -Wall -O3 -DNDEBUG
 

@@ -1,2 +1,5 @@
 compile_commands.json
 main
+
+.cache/
+.cache**
