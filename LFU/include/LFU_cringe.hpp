@@ -1,6 +1,7 @@
 #ifndef LFU_HPP
 #define LFU_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -32,6 +33,7 @@ class LFU final {
     };
     
     using size_type = typename std::vector<LFU_ELEM>::size_type;
+    using vec_iter =  typename std::vector<LFU_ELEM>::iterator;
 
     static constexpr size_t NOT_FOUND       = 0xDEADBEEF;
     static constexpr size_t MAX_HIT_COUNTS  = UINT32_MAX;
@@ -72,7 +74,7 @@ public:
     // Lookup for elem in cache. In case of miss - add new elem and 
     // replace least used elem with new one if needed.
     bool LookupAndHandle (const KeyT& key){
-        vec_iter elem = FindElem(key); 
+        auto elem = FindElem(key); 
         
         if (elem == cache_.end()){
             if (IsFull())
@@ -81,7 +83,7 @@ public:
                 cache_.emplace_back(0, key, 0);
             return NOT_HIT;
         } else {
-            cache_[(*elem)->id].hit_count++;
+            cache_[elem->key].hit_count++;
             total_hit_count_++;
             
             return HIT;
@@ -89,23 +91,17 @@ public:
     }
 
     // Still in progress
-    using vec_iter = typename std::vector<KeyT>::iterator;
     vec_iter FindElem (const KeyT& key) const {
         // Iterating like real gangsters
-        for (vec_iter iter = cache_.begin(), vec_end = cache_.end(); iter < vec_end; iter++)
-        {
-            if ((*iter)->key == key)
-                return iter;
-        }
-        return cache_.end();
+        return std::find_if (cache_.begin(), cache_.end(), [&key](const LFU_ELEM& elem) { return elem.key == key; });
     }
 
     std::pair<PageT, bool> GetElementById (const KeyT& key) const {
         auto result = LookupAndHandle (key);
         if (result == HIT)
-            return std::make_pair(cache_[result].page, true);
+            return std::make_pair (cache_[result].page, true);
         // Well, I don't now which element to return for better clarity.
-        return std::make_pair(cache_[0].page, false);
+        return std::make_pair (cache_[0].page, false);
     }
 
     // Checks if cache can't fit more elems inside
