@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 #include <vector>
 #include <array>
 #include <iostream>
@@ -71,37 +72,40 @@ public:
     // Lookup for elem in cache. In case of miss - add new elem and 
     // replace least used elem with new one if needed.
     bool LookupAndHandle (const KeyT& key){
-        size_type elem_id = FindElem(key); 
+        vec_iter elem = FindElem(key); 
         
-        if (elem_id == NOT_FOUND){
+        if (elem == cache_.end()){
             if (IsFull())
                 SearchAndReplace(key);
             else
-                cache_.push_back({0, key, 0});
+                cache_.emplace_back(0, key, 0);
             return NOT_HIT;
         } else {
-            cache_[elem_id].hit_count++;
+            cache_[(*elem)->id].hit_count++;
             total_hit_count_++;
             
             return HIT;
         }
     }
 
-    // Find element in cache_
-    size_t FindElem (const KeyT& key) const {
-        for (size_t i = 0; i < cache_.size(); i++){
-            if (cache_[i].key == key)
-                return i;
+    // Still in progress
+    using vec_iter = typename std::vector<KeyT>::iterator;
+    vec_iter FindElem (const KeyT& key) const {
+        // Iterating like real gangsters
+        for (vec_iter iter = cache_.begin(), vec_end = cache_.end(); iter < vec_end; iter++)
+        {
+            if ((*iter)->key == key)
+                return iter;
         }
-
-        return NOT_FOUND;
+        return cache_.end();
     }
 
-    KeyT GetElementById (const KeyT& key) const {
+    std::pair<PageT, bool> GetElementById (const KeyT& key) const {
         auto result = LookupAndHandle (key);
         if (result == HIT)
-            return result;
-        return nullptr;
+            return std::make_pair(cache_[result].page, true);
+        // Well, I don't now which element to return for better clarity.
+        return std::make_pair(cache_[0].page, false);
     }
 
     // Checks if cache can't fit more elems inside

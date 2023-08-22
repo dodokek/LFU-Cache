@@ -47,11 +47,15 @@ class LFU final {
     
     std::unordered_map<KeyT, FREQ_NODE> cache_;
 
+    void CreateNewFreqNode ()
+    {
+
+    }
+
 public:
     LFU (size_t capacity) : capacity_(capacity) {
         cache_.reserve(capacity);
     }
-
 
     void Dump () const {
         std::cout << "------- Dump of Class: LFU -------\n";

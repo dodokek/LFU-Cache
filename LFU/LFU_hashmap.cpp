@@ -14,17 +14,17 @@ int main()
     
     LFU_CACHE::LFU<int, int> lfu_instance(cache_capactiy);
 
-    for (size_t i = 0 ; i < input_size; i++)
-    {
-        int new_elem = 0;
-        std::cin >> new_elem;
+    // for (size_t i = 0 ; i < input_size; i++)
+    // {
+    //     int new_elem = 0;
+    //     std::cin >> new_elem;
 
-        if (!std::cin.good())
-            std::cerr << "Bad input\n";
+    //     if (!std::cin.good())
+    //         std::cerr << "Bad input\n";
 
-        lfu_instance.LookupAndHandle(new_elem);
-        // lfu_instance.Dump();
-    }
+    //     lfu_instance.LookupAndHandle(new_elem);
+    //     // lfu_instance.Dump();
+    // }
 
-    std::cout << lfu_instance.GetHitcountInfo() << "\n";
+    // std::cout << lfu_instance.GetHitcountInfo() << "\n";
 }
