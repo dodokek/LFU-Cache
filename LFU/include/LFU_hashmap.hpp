@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <iostream>
 #include <limits.h>
+#include <list>
 #include <stdint.h>
 #include <map>
 #include <set>
@@ -13,48 +14,42 @@
 namespace LFU_CACHE
 {
 
-enum FIND_STATE
-{
-    HIT,
-    NOT_HIT
-};
-
-
 template<typename PageT, typename KeyT>
 class LFU final {
     struct LFU_ELEM;
     struct FREQ_NODE;
 
-    using size_type = typename std::unordered_map<KeyT, FREQ_NODE>::size_type;
+    using size_type      = typename std::list<LFU_ELEM>::size_type;
+    using freq_node_iter = typename std::list<FREQ_NODE>::iterator; 
 
     struct LFU_ELEM
     {
-        PageT    page;
-        KeyT     key;
+        PageT          page;
+        KeyT           key;
+        freq_node_iter parent_freq_node;
     };
 
     struct FREQ_NODE
     {
-        int value;
+        int frequency;
 
-        std::set<LFU_ELEM> items;
-        FREQ_NODE* prev;
-        FREQ_NODE* next;
+        std::list<LFU_ELEM> items;
     };
     
     size_type capacity_;
     long int  total_hit_count_ = 0;
     
-    std::unordered_map<KeyT, FREQ_NODE> cache_;
+    std::unordered_map<KeyT, LFU_ELEM> hashmap_;
+    std::list<FREQ_NODE> cache_;
 
-    void CreateNewFreqNode ()
-    {
 
-    }
 
 public:
-    LFU (size_t capacity) : capacity_(capacity) {
-        cache_.reserve(capacity);
+    LFU (size_t capacity) : capacity_(capacity) {}
+
+    int LookupAndHandle(KeyT key)
+    {
+
     }
 
     void Dump () const {

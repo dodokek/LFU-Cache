@@ -15,12 +15,6 @@
 namespace LFU_CACHE
 {
 
-enum FIND_STATE
-{
-    HIT,
-    NOT_HIT
-};
-
 
 template<typename PageT, typename KeyT>
 class LFU final {
@@ -69,12 +63,12 @@ public:
                 SearchAndReplace(key);
             else
                 cache_.push_back({0, key, 0});
-            return NOT_HIT;
+            return false;
         } else {
             cache_[elem->key].hit_count++;
             total_hit_count_++;
             
-            return HIT;
+            return true;
         }
     }
 
@@ -87,7 +81,7 @@ public:
 
     std::pair<PageT, bool> GetElementById (const KeyT& key) const {
         auto result = LookupAndHandle (key);
-        if (result == HIT)
+        if (result == true)
             return std::make_pair (cache_[result].page, true);
         // Not sure which element to return for better clarity.
         return std::make_pair (cache_[0].page, false);
