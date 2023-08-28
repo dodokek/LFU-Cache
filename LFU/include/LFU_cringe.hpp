@@ -10,7 +10,7 @@
 #include <iostream>
 #include <limits.h>
 #include <stdint.h>
-
+#include <iterator>
 
 namespace LFU_CACHE
 {
@@ -34,36 +34,24 @@ class LFU final {
     
     using size_type = typename std::vector<LFU_ELEM>::size_type;
     using vec_iter =  typename std::vector<LFU_ELEM>::iterator;
-
-    static constexpr size_t NOT_FOUND       = 0xDEADBEEF;
-    static constexpr size_t MAX_HIT_COUNTS  = UINT32_MAX;
+    //TODO implement with emplace_back
+    // using page_type = std::function<PageT(const KeyT&)>; 
 
     size_type capacity_;
     long int  total_hit_count_ = 0;
+    PageT init_page_;
     
     std::vector<LFU_ELEM> cache_;
 
     void SearchAndReplace (const KeyT& key)
     {
-        size_t min_hits  = MAX_HIT_COUNTS;
-        size_type min_index = NOT_FOUND;
-
-        // Search in whole vector, because we 100% sure, that it's full.
-        for (size_t i = 0; i < capacity_; i++){
-            if (cache_[i].hit_count < min_hits){
-                min_hits = cache_[i].hit_count;
-                min_index = i;
-            }
-        }
-
-        if (min_index == NOT_FOUND)
-            std::cerr << "Error in Search during replace attempt\n";
+        vec_iter min_elem = std::min_element(cache_.begin(), cache_.end(),
+                                             [](auto& first, auto& second){return first.hit_count < second.hit_count; });
         
-        LFU_ELEM tmp_elem = {
-            .key = key 
-        };
+        cache_.erase(min_elem);
 
-        cache_[min_index] = tmp_elem;
+        //TODO replace with emplace back
+        cache_.push_back({0, key, 0});    
     }
 
 public:
@@ -80,7 +68,7 @@ public:
             if (IsFull())
                 SearchAndReplace(key);
             else
-                cache_.emplace_back(0, key, 0);
+                cache_.push_back({0, key, 0});
             return NOT_HIT;
         } else {
             cache_[elem->key].hit_count++;
@@ -90,17 +78,18 @@ public:
         }
     }
 
-    // Still in progress
-    vec_iter FindElem (const KeyT& key) const {
-        // Iterating like real gangsters
+
+    vec_iter FindElem (const KeyT &key)
+    {
         return std::find_if (cache_.begin(), cache_.end(), [&key](const LFU_ELEM& elem) { return elem.key == key; });
     }
+
 
     std::pair<PageT, bool> GetElementById (const KeyT& key) const {
         auto result = LookupAndHandle (key);
         if (result == HIT)
             return std::make_pair (cache_[result].page, true);
-        // Well, I don't now which element to return for better clarity.
+        // Not sure which element to return for better clarity.
         return std::make_pair (cache_[0].page, false);
     }
 
