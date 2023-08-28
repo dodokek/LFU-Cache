@@ -48,8 +48,45 @@ class LFU final {
     std::list<FREQ_NODE> cache_;
 
 
+    void AddNewItem (const KeyT& key)
+    {
+        freq_node_iter begin_freq_list = cache_.begin();
+
+        auto& items_list = begin_freq_list->items;
+        
+        if (IsFull()){
+            auto item_to_erase = items_list.begin();
+            items_list.erase (item_to_erase);
+            hashmap_.erase (item_to_erase->key);
+        } 
+
+        items_list.emplace (items_list.end() ,init_page_, key, begin_freq_list);
+        
+        //TODO Why it won't compile with items_list.back() ???
+        hashmap_[key] = std::prev(items_list.end());
+
+    }
+
+
+    void HandleExistingItem (hashmap_iter item)
+    {
+        auto content = item->second;
+
+        freq_node_iter cur_freq_node = content->parent_freq_node;
+        freq_node_iter next_freq_node = std::next(cur_freq_node);
+
+        if (next_freq_node == cache_.end() || ( cur_freq_node->frequency + 1 != next_freq_node->frequency )){
+            next_freq_node = cache_.emplace (next_freq_node, cur_freq_node->frequency + 1);
+        }
+
+        next_freq_node->items.splice (next_freq_node->items.end(), cur_freq_node->items, content);
+        content->parent_freq_node = next_freq_node;
+    }
+
 public:
-    LFU (size_t capacity) : capacity_(capacity) {
+    LFU (size_type capacity) : capacity_(capacity) {
+        
+        //TODO Sort of cringe
         auto first_elem = cache_.emplace (cache_.end());
         first_elem->frequency = 1;
     }
@@ -64,40 +101,6 @@ public:
             HandleExistingItem (elem);
             return true;
         }
-    }
-
-
-    void AddNewItem (const KeyT& key)
-    {
-        freq_node_iter begin_freq_list = cache_.begin();
-
-        auto& items_list = begin_freq_list->items;
-        
-        if (IsFull()){
-            auto item_to_erase = items_list.begin();
-            items_list.erase (item_to_erase);
-            hashmap_.erase (item_to_erase->key);
-        } 
-
-        items_list.emplace (init_page_, key, begin_freq_list);
-        hashmap_[key] = items_list.back();
-    }
-
-
-    void HandleExistingItem (hashmap_iter item)
-    {
-        KeyT&     key     = item->first;   
-        LFU_ELEM& content = item->second;
-
-        freq_node_iter cur_freq_node = content.parent_freq_node;
-        freq_node_iter next_freq_node = std::next(cur_freq_node);
-
-        if (next_freq_node == cache_.end() || ( cur_freq_node.frequency != next_freq_node.frequency )){
-            next_freq_node = cache_.emplace (next_freq_node, cur_freq_node.frequency);
-        }
-
-        next_freq_node.items.splice (next_freq_node.items.end(), cur_freq_node->items, content);
-        content.parent_freq_node = next_freq_node;
     }
 
 
