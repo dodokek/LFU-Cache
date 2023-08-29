@@ -5,8 +5,8 @@
 
 int main()
 {
-    size_t cache_capactiy = 0;
-    size_t input_size = 0;
+    size_t cache_capactiy;
+    size_t input_size;
     
     std::cin >> cache_capactiy >> input_size;
     if (!std::cin.good())
@@ -16,11 +16,16 @@ int main()
 
     for (size_t i = 0 ; i < input_size; i++)
     {
-        int new_elem = 0;
-        std::cin >> new_elem;
+        int new_elem;
+        try {
+            std::cin >> new_elem;
 
-        if (!std::cin.good())
-            std::cerr << "Bad input\n";
+            if (!std::cin.good())
+                throw "Bad input";
+
+        } catch (char* error) {
+            std::cout << error << "\n";
+        }
 
         lfu_instance.LookupAndHandle(new_elem);
         // lfu_instance.Dump();

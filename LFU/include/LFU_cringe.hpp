@@ -1,22 +1,16 @@
-#ifndef LFU_HPP
-#define LFU_HPP
+#ifndef LFU_CRINGE
+#define LFU_CRINGE
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <utility>
 #include <vector>
-#include <array>
 #include <iostream>
-#include <limits.h>
-#include <stdint.h>
-#include <iterator>
 
 namespace LFU_CACHE
 {
 
-
-template<typename PageT, typename KeyT>
+template<typename KeyT, typename PageT>
 class LFU final {
     
     struct LFU_ELEM
@@ -27,9 +21,7 @@ class LFU final {
     };
     
     using size_type = typename std::vector<LFU_ELEM>::size_type;
-    using vec_iter =  typename std::vector<LFU_ELEM>::iterator;
-    //TODO implement with emplace_back
-    // using page_type = std::function<PageT(const KeyT&)>; 
+    using cache_iter =  typename std::vector<LFU_ELEM>::iterator;
 
     size_type capacity_;
     long int  total_hit_count_ = 0;
@@ -39,7 +31,7 @@ class LFU final {
 
     void SearchAndReplace (const KeyT& key)
     {
-        vec_iter min_elem = std::min_element(cache_.begin(), cache_.end(),
+        cache_iter min_elem = std::min_element(cache_.begin(), cache_.end(),
                                              [](auto& first, auto& second){return first.hit_count < second.hit_count; });
         
         cache_.erase(min_elem);
@@ -73,9 +65,9 @@ public:
     }
 
 
-    vec_iter FindElem (const KeyT &key)
+    cache_iter FindElem (const KeyT &key) 
     {
-        return std::find_if (cache_.begin(), cache_.end(), [&key](const LFU_ELEM& elem) { return elem.key == key; });
+        return std::find_if (cache_.begin(), cache_.end(), [&key](auto& elem) { return elem.key == key; });
     }
 
 
@@ -113,6 +105,6 @@ public:
     }
 }; 
 
-};
+} // LFU_CACHE
 
-#endif
+#endif // #ifdef LFU_CRINGE

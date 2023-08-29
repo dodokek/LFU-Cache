@@ -1,13 +1,10 @@
-#ifndef LFU_HPP
-#define LFU_HPP
+#ifndef LFU_HASHMAP
+#define LFU_HASHMAP
 
 #include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <iterator>
-#include <limits.h>
 #include <list>
-#include <stdint.h>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -15,7 +12,7 @@
 namespace LFU_CACHE
 {
 
-template<typename PageT, typename KeyT>
+template<typename KeyT, typename PageT>
 class LFU final {
     struct LFU_ELEM;
     struct FREQ_NODE;
@@ -27,16 +24,22 @@ class LFU final {
 
     struct LFU_ELEM
     {
-        PageT          page;
-        KeyT           key;
-        freq_node_iter parent_freq_node;
+        PageT          page_;
+        KeyT           key_;
+        freq_node_iter parent_freq_node_;
+
+        //TODO, This move fixes compilation errors, but seems cringe
+        LFU_ELEM (KeyT key, freq_node_iter parent_freq_node) 
+            : key_(key), parent_freq_node_(parent_freq_node) {};
     };
 
     struct FREQ_NODE
     {
-        int frequency;
+        int frequency_;
 
-        std::list<LFU_ELEM> items;
+        std::list<LFU_ELEM> items_;
+
+        FREQ_NODE (size_type frequency) : frequency_(frequency) {};
     };
     
     size_type capacity_;
@@ -47,48 +50,11 @@ class LFU final {
     std::unordered_map<KeyT, elem_iter> hashmap_;
     std::list<FREQ_NODE> cache_;
 
-
-    void AddNewItem (const KeyT& key)
-    {
-        freq_node_iter begin_freq_list = cache_.begin();
-
-        auto& items_list = begin_freq_list->items;
-        
-        if (IsFull()){
-            auto item_to_erase = items_list.begin();
-            items_list.erase (item_to_erase);
-            hashmap_.erase (item_to_erase->key);
-        } 
-
-        items_list.emplace (items_list.end() ,init_page_, key, begin_freq_list);
-        
-        //TODO Why it won't compile with items_list.back() ???
-        hashmap_[key] = std::prev(items_list.end());
-
-    }
-
-
-    void HandleExistingItem (hashmap_iter item)
-    {
-        auto content = item->second;
-
-        freq_node_iter cur_freq_node = content->parent_freq_node;
-        freq_node_iter next_freq_node = std::next(cur_freq_node);
-
-        if (next_freq_node == cache_.end() || ( cur_freq_node->frequency + 1 != next_freq_node->frequency )){
-            next_freq_node = cache_.emplace (next_freq_node, cur_freq_node->frequency + 1);
-        }
-
-        next_freq_node->items.splice (next_freq_node->items.end(), cur_freq_node->items, content);
-        content->parent_freq_node = next_freq_node;
-    }
-
 public:
     LFU (size_type capacity) : capacity_(capacity) {
         
         //TODO Sort of cringe
-        auto first_elem = cache_.emplace (cache_.end());
-        first_elem->frequency = 1;
+        auto first_elem = cache_.emplace_back (1);
     }
 
     bool LookupAndHandle(const KeyT& key)
@@ -103,7 +69,42 @@ public:
         }
     }
 
+private:
+    void AddNewItem (const KeyT& key)
+    {
+        freq_node_iter begin_freq_list = cache_.begin();
 
+        auto& items_list = begin_freq_list->items_;
+        
+        if (IsFull()){
+            auto item_to_erase = items_list.begin();
+            items_list.erase (item_to_erase);
+            hashmap_.erase (item_to_erase->key_);
+        } 
+
+        items_list.emplace_back (key, begin_freq_list);
+        
+        hashmap_[key] = std::prev(items_list.end());
+
+    }
+
+
+    void HandleExistingItem (hashmap_iter item)
+    {
+        total_hit_count_++;
+        elem_iter content = item->second;
+
+        freq_node_iter cur_freq_node = content->parent_freq_node_;
+        auto next_freq_node = std::next(cur_freq_node);
+        if (next_freq_node == cache_.end() || ( cur_freq_node->frequency_ + 1 != next_freq_node->frequency_ )){
+            next_freq_node = cache_.emplace (next_freq_node, cur_freq_node->frequency_ + 1);
+        }
+
+        next_freq_node->items_.splice (next_freq_node->items_.end(), cur_freq_node->items_, content);
+        content->parent_freq_node_ = next_freq_node;
+    }
+
+public:
     bool IsFull () const 
     {
         return hashmap_.size() == capacity_;
@@ -122,15 +123,15 @@ public:
 
         std::cout << "Elements in cache: \n";
 
-        for (auto cur = hashmap_.begin(), end = hashmap_.end(); cur != end; std::next(cur))
+        for (auto cur = hashmap_.begin(), end = hashmap_.end(); cur != end; ++cur)
         {
-            // std::cout << "Key: " << cur->first << " Value: " << cur->second << "\n";
+            std::cout << "\tKey: " << cur->first << " Hits: " << cur->second->parent_freq_node_->frequency_ <<  "\n";
         }
 
         std::cout << "------- End of dump --------------\n";   
     }
 }; 
 
-};
+} // LFU_CACHE
 
-#endif
+#endif // #ifdef LFU_HASHMAP
