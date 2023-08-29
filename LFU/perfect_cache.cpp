@@ -8,7 +8,7 @@ int main()
     if (!std::cin.good())
         throw std::runtime_error{"Bad input: cache capacity"};
 
-    PERFECT_CACHE::PerfectCache<int, int, 20000> cache_instance(cache_capactiy);
+    PERFECT_CACHE::PerfectCache<int, int> cache_instance(cache_capactiy);
 
 
 }

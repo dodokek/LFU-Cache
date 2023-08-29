@@ -10,7 +10,7 @@ int main()
     
 
     std::cin >> cache_capactiy >> input_size;
-     if (!std::cin.good())
+    if (!std::cin.good())
         throw std::runtime_error{"Bad input: cache capacity"};
 
     
