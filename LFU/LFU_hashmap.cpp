@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <iostream>
+#include <stdexcept>
 
 #include "LFU_hashmap.hpp"
 
@@ -10,22 +11,19 @@ int main()
     
     std::cin >> cache_capactiy >> input_size;
     if (!std::cin.good())
-        std::cerr << "Bad input\n";
-    
+        throw std::runtime_error{"Bad input: cache capacity"};
+
     LFU_CACHE::LFU<int, int> lfu_instance(cache_capactiy);
 
     for (size_t i = 0 ; i < input_size; i++)
     {
         int new_elem;
-        try {
-            std::cin >> new_elem;
+        std::cin >> new_elem;
 
-            if (!std::cin.good())
-                throw "Bad input";
+        if (!std::cin.good())
+            throw std::runtime_error{"Bad input: wrong Key"};
 
-        } catch (char* error) {
-            std::cout << error << "\n";
-        }
+        
 
         lfu_instance.LookupAndHandle(new_elem);
         lfu_instance.Dump();

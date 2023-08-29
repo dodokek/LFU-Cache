@@ -56,8 +56,7 @@ public:
         auto first_elem = cache_.emplace_back (1);
     }
 
-    bool LookupAndHandle(const KeyT& key)
-    {
+    bool LookupAndHandle(const KeyT& key) {
         hashmap_iter elem = hashmap_.find (key); 
         if (elem == hashmap_.end()){
             AddNewItem (key);
@@ -69,8 +68,7 @@ public:
     }
 
 private:
-    void AddNewItem (const KeyT& key)
-    {
+    void AddNewItem (const KeyT& key) {
         freq_node_iter begin_freq_list = cache_.begin();
 
         auto& items_list = begin_freq_list->items_;
@@ -88,8 +86,7 @@ private:
     }
 
 
-    void HandleExistingItem (hashmap_iter item)
-    {
+    void HandleExistingItem (hashmap_iter item) {
         total_hit_count_++;
         elem_iter content = item->second;
 
@@ -104,8 +101,7 @@ private:
     }
 
 public:
-    bool IsFull () const 
-    {
+    bool IsFull () const {
         return hashmap_.size() == capacity_;
     }
 
@@ -122,8 +118,7 @@ public:
 
         std::cout << "Elements in cache: \n";
 
-        for (auto cur = hashmap_.begin(), end = hashmap_.end(); cur != end; ++cur)
-        {
+        for (auto cur = hashmap_.begin(), end = hashmap_.end(); cur != end; ++cur) {
             std::cout << "\tKey: " << cur->first << " Hits: " << cur->second->parent_freq_node_->frequency_ <<  "\n";
         }
 
