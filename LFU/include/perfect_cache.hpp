@@ -11,6 +11,7 @@
 
 namespace PERFECT_CACHE
 {
+
 template<typename KeyT, typename PageT, std::size_t InputMaxSize>
 class PerfectCache final
 {
@@ -18,6 +19,7 @@ class PerfectCache final
 
 public:    
     using cache_iterator = typename std::list<LFU_ELEM>::iterator;
+    using size_type      = typename std::array<LFU_ELEM, InputMaxSize>::size_type;
 
 private:
     struct LFU_ELEM
@@ -34,9 +36,26 @@ private:
     std::unordered_map<KeyT, cache_iterator> hashmap_;
     std::array<KeyT, InputMaxSize> input_data_;
 
-    void GetInput ()
-    {
-        
+    size_type input_size_;
+    size_type capacity_;
+
+public:
+    PerfectCache (size_type capacity) : capacity_(capacity) {}
+ 
+    void GetInput () {
+        std::cin >> input_size_;
+
+        for (size_type i = 0 ; i < input_size_; i++)
+        {
+            KeyT new_elem;
+            std::cin >> new_elem;
+
+            if (!std::cin.good())
+                throw std::runtime_error{"Bad input: wrong Key"};
+            
+            input_data_[i] = new_elem;
+        }
+
     }
 
 };

@@ -23,8 +23,6 @@ int main()
         if (!std::cin.good())
             throw std::runtime_error{"Bad input: wrong Key"};
 
-        
-
         lfu_instance.LookupAndHandle(new_elem);
         lfu_instance.Dump();
 
