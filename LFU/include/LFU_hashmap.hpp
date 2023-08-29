@@ -1,12 +1,9 @@
 #ifndef LFU_HASHMAP
 #define LFU_HASHMAP
 
-#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <list>
-#include <map>
-#include <set>
 #include <unordered_map>
 
 namespace LFU_CACHE
@@ -17,11 +14,13 @@ class LFU final {
     struct LFU_ELEM;
     struct FREQ_NODE;
 
-    using size_type      = typename std::list<LFU_ELEM>::size_type;
     using freq_node_iter = typename std::list<FREQ_NODE>::iterator; 
+public:    
+    using size_type      = typename std::list<LFU_ELEM>::size_type;
     using elem_iter      = typename std::list<LFU_ELEM>::iterator;
     using hashmap_iter   = typename std::unordered_map<KeyT, elem_iter>::iterator;
 
+private:
     struct LFU_ELEM
     {
         PageT          page_;
