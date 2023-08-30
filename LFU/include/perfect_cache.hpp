@@ -41,7 +41,7 @@ private:
 
     size_type input_size_;
     size_type capacity_;
-    int hitcount_;
+    int hitcount_ = 0;
 
 public:
     PerfectCache (size_type capacity) : capacity_(capacity) {
@@ -107,8 +107,6 @@ public:
 
 private:
     void HandleNewItem (const KeyT& key) {
-        hitcount_++;
-        
         if (IsFull()) {
             DeleteLeastFreq ();
         }
@@ -118,7 +116,7 @@ private:
 
 
     void DeleteLeastFreq () {
-        auto elem_to_delete = cache_.end();
+        auto elem_to_delete = std::prev(cache_.end());
 
         for (auto cur_elem = cache_.begin(), end = cache_.end(); cur_elem != end; ++cur_elem) {
             if (hashmap_.find (cur_elem->key_) != hashmap_.end()) {
