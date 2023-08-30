@@ -21,7 +21,7 @@ class PerfectCache final
 public:    
     using cache_iterator = typename std::list<LFU_ELEM>::iterator;
     using size_type      = typename std::vector<LFU_ELEM>::size_type;
-    using hashmap_iter   = typename std::unordered_map<KeyT, cache_iterator>;
+    using hashmap_iter   = typename std::unordered_map<KeyT, cache_iterator>::iterator;
 
 private:
     struct LFU_ELEM
@@ -66,13 +66,39 @@ public:
         hashmap_iter elem = hashmap_.find(key);
 
         if (elem == hashmap_.end()) {
-            AddNewItem(key);
+            HandleNewItem (key);
             return false;
         } else {
-            HandleExistingItem (key);
+            hitcount_++;
             return true;
         }
     }
+
+
+    void RunCache () {
+        for (auto cur = input_data_.begin(), end = input_data_.end(); cur != end; ++cur) {
+            LookupAndHandle(*cur);
+            Dump ();
+        }
+
+        std::cout << "Hitcount: " << hitcount_ << '\n';
+    }
+
+
+    void Dump () const {
+        std::cout << "------- Dump of Class: LFU -------\n";
+        std::cout << "Capacity: " << capacity_     << "\n";
+        std::cout << "Size: "     << cache_.size() << "\n";
+
+        std::cout << "Elements in cache: \n";
+
+        for (auto elem : cache_) {
+            std::cout << "Key: " << elem.key_ << '\n';
+        }
+
+        std::cout << "------- End of dump --------------\n";   
+    }
+
 
     bool IsFull () const {
         return cache_.size() == capacity_;
@@ -80,18 +106,12 @@ public:
 
 
 private:
-    void AddNewItem (const KeyT& key) {
-        cache_.emplace_front(key);
-        hashmap_[key] = std::next (cache_.begin());
-    }
-
-
-    void HandleExistingItem (const KeyT& key) {
+    void HandleNewItem (const KeyT& key) {
         hitcount_++;
         
-        if (IsFull()) 
+        if (IsFull()) {
             DeleteLeastFreq ();
-
+        }
         cache_.emplace_front(key);
         hashmap_[key] = std::next (cache_.begin());
     }
@@ -104,11 +124,14 @@ private:
             if (hashmap_.find (cur_elem->key_) != hashmap_.end()) {
                 if (help_buffer_.find(cur_elem->key_) != help_buffer_.end())
                     elem_to_delete = cur_elem;
-                help_buffer_.insert(cur_elem->key);
+                help_buffer_.insert(cur_elem->key_);
             }
         }
 
-        help_buffer_.erase(elem_to_delete->key);
+        std::cout << "\tElem to delete: " << elem_to_delete->key_ << '\n';
+
+        help_buffer_.erase(elem_to_delete->key_);
+        hashmap_.erase(elem_to_delete->key_);
         cache_.erase(elem_to_delete);
     }
 

@@ -10,5 +10,6 @@ int main()
 
     PERFECT_CACHE::PerfectCache<int, int> cache_instance(cache_capactiy);
 
-
+    cache_instance.GetInput();
+    cache_instance.RunCache();
 }
