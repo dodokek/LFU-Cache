@@ -24,11 +24,13 @@ You will get three executables:
 
 In this repository you can also find Python script for test generation and Shellscript for answers generation.
 
-You can generate any amount of tests by:
+You can generate any amount(10 as example) of tests by:
 ```shell
-./test_get/gen_tests.py <amount_of_tests>
+./test_get/gen_tests.py
+> 10 
 ```
 After that, you can run tests on executable by:
 ```shell
 ./test_gen/run_tests.sh <amount_of_tests> <path_to_exec>
 ```
+

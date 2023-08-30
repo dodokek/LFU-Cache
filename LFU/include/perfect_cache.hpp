@@ -78,10 +78,10 @@ public:
     void RunCache () {
         for (auto cur = input_data_.begin(), end = input_data_.end(); cur != end; ++cur) {
             LookupAndHandle(*cur);
-            Dump ();
+            // Dump ();
         }
 
-        std::cout << "Hitcount: " << hitcount_ << '\n';
+        std::cout << hitcount_ << '\n';
     }
 
 
@@ -126,7 +126,7 @@ private:
             }
         }
 
-        std::cout << "\tElem to delete: " << elem_to_delete->key_ << '\n';
+        // std::cout << "\tElem to delete: " << elem_to_delete->key_ << '\n';
 
         help_buffer_.erase(elem_to_delete->key_);
         hashmap_.erase(elem_to_delete->key_);

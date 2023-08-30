@@ -24,7 +24,7 @@ int main()
             throw std::runtime_error{"Bad input: wrong Key"};
 
         lfu_instance.LookupAndHandle(new_elem);
-        lfu_instance.Dump();
+        // lfu_instance.Dump();
 
     }
 
