@@ -9,7 +9,7 @@ if [ "$1" ]; then
      while [ "$i" -lt $tests_amount ]; do
 	    echo "Running test $i" 
 	    i=$(( i + 1 ))
-	    ../LFU/build/main < ./tests/$i.txt > ./tests/ans_$i.txt
+	    $2 < ./tests/$i.txt > ./tests/ans_$i.txt
      done
   
 else
