@@ -43,8 +43,6 @@ private:
     
     size_type capacity_;
     long int  total_hit_count_ = 0;
-    //TODO remove this shit
-    PageT init_page_;
     
     std::unordered_map<KeyT, elem_iter> hashmap_;
     std::list<FREQ_NODE> cache_;

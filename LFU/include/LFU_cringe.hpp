@@ -2,7 +2,6 @@
 #define LFU_CRINGE
 
 #include <algorithm>
-#include <cstddef>
 #include <utility>
 #include <vector>
 #include <iostream>
@@ -18,6 +17,7 @@ class LFU final {
         PageT    page;
         KeyT     key;
         long int hit_count;
+
     };
     
     using size_type = typename std::vector<LFU_ELEM>::size_type;
@@ -25,7 +25,6 @@ class LFU final {
 
     size_type capacity_;
     long int  total_hit_count_ = 0;
-    PageT init_page_;
     
     std::vector<LFU_ELEM> cache_;
 
@@ -36,7 +35,6 @@ class LFU final {
         
         cache_.erase(min_elem);
 
-        //TODO replace with emplace back
         cache_.push_back({0, key, 0});    
     }
 
@@ -97,7 +95,7 @@ public:
 
         std::cout << "Elements in cache: \n";
 
-        for (size_t i = 0; i < cache_.size(); i++){
+        for (size_type i = 0; i < cache_.size(); i++){
             std::cout << i <<": Key = " << cache_[i].key << ", HitCount = " << cache_[i].hit_count << "\n";
         }
 

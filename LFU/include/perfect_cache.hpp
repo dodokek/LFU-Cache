@@ -1,7 +1,7 @@
 #ifndef PERFECT_HPP
 #define PERFECT_HPP
 
-#include <cstddef>
+#include <climits>
 #include <unordered_map>
 #include <list>
 #include <vector>
@@ -108,6 +108,7 @@ public:
 private:
     void HandleNewItem (const KeyT& key) {
         if (IsFull()) {
+            // DeleteLeastFreqNaive ();
             DeleteLeastFreq ();
         }
         cache_.emplace_front(key);
@@ -128,7 +129,30 @@ private:
 
         // std::cout << "\tElem to delete: " << elem_to_delete->key_ << '\n';
 
-        help_buffer_.erase(elem_to_delete->key_);
+        help_buffer_.clear();
+        hashmap_.erase(elem_to_delete->key_);
+        cache_.erase(elem_to_delete);
+    }
+
+
+    void DeleteLeastFreqNaive() {
+        auto elem_to_delete = std::prev(cache_.end());
+        for (auto cur_elem = cache_.begin(), end = cache_.end(); cur_elem != end; ++cur_elem) {
+            int max_dist = -INT_MAX;
+            
+            int counter = 0;
+            for (auto input_elem = input_data_.begin(), end = input_data_.end(); input_elem != end; ++input_elem) {
+                if (*input_elem == cur_elem->key_) {
+                    if (counter > max_dist) {
+                        elem_to_delete = cur_elem;
+                        max_dist = counter;
+                    }
+                    break;
+                }
+                counter++;
+            }
+        }
+
         hashmap_.erase(elem_to_delete->key_);
         cache_.erase(elem_to_delete);
     }
