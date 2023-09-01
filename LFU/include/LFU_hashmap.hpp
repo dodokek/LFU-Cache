@@ -27,7 +27,6 @@ private:
         KeyT           key_;
         freq_node_iter parent_freq_node_;
 
-        //TODO, This move fixes compilation errors, but seems cringe
         LFU_ELEM (KeyT key, freq_node_iter parent_freq_node) 
             : key_(key), parent_freq_node_(parent_freq_node) {};
     };
@@ -49,8 +48,6 @@ private:
 
 public:
     LFU (size_type capacity) : capacity_(capacity) {
-        
-        //TODO Sort of cringe
         auto first_elem = cache_.emplace_back (1);
     }
 
