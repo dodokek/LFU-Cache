@@ -6,7 +6,7 @@ Here is my 2 different implementations of LFU cache and implementation of "Perfe
 
 ## Build
 
-To build all three caches you need to execute the following commands:
+To build the project, you need to execute the following commands:
 ```shell
 cd LFU
 mkdir build
