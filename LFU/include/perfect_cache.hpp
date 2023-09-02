@@ -108,8 +108,8 @@ public:
 private:
     void HandleNewItem (const KeyT& key) {
         if (IsFull()) {
-            // DeleteLeastFreqNaive ();
-            DeleteLeastFreq ();
+            DeleteLeastFreqNaive ();
+            // DeleteLeastFreq ();
         }
         cache_.emplace_front(key);
         hashmap_[key] = std::next (cache_.begin());
@@ -138,7 +138,8 @@ private:
     void DeleteLeastFreqNaive() {
         auto elem_to_delete = std::prev(cache_.end());
         for (auto cur_elem = cache_.begin(), end = cache_.end(); cur_elem != end; ++cur_elem) {
-            int max_dist = -INT_MAX;
+            // It used to be -INT_MAX, pretty funny
+            int max_dist = INT_MIN;
             
             int counter = 0;
             for (auto input_elem = input_data_.begin(), end = input_data_.end(); input_elem != end; ++input_elem) {
@@ -159,6 +160,6 @@ private:
 
 };
 
-} // enum PERFECT_CACHE
+} // namespace PERFECT_CACHE
 
 #endif // PERFECT_HPP 

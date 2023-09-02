@@ -18,9 +18,11 @@ class LFU final {
         KeyT     key;
         long int hit_count;
 
+        LFU_ELEM (KeyT key) 
+            : key(key) {};
     };
     
-    using size_type = typename std::vector<LFU_ELEM>::size_type;
+    using size_type  = typename std::vector<LFU_ELEM>::size_type;
     using cache_iter =  typename std::vector<LFU_ELEM>::iterator;
 
     size_type capacity_;
@@ -35,7 +37,7 @@ class LFU final {
         
         cache_.erase(min_elem);
 
-        cache_.push_back({0, key, 0});    
+        cache_.emplace_back(key);    
     }
 
 public:
@@ -52,7 +54,7 @@ public:
             if (IsFull())
                 SearchAndReplace(key);
             else
-                cache_.push_back({0, key, 0});
+                cache_.emplace_back(key);
             return false;
         } else {
             cache_[elem->key].hit_count++;
