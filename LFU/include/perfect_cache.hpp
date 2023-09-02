@@ -62,26 +62,28 @@ public:
         }
     }
 
-    bool LookupAndHandle (const KeyT& key) {
+
+    void RunCache () {
+        for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
+             cur != end; ++cur, ++indx) {
+            LookupAndHandle(*cur, indx);
+            Dump ();
+        }
+
+        std::cout << hitcount_ << '\n';
+    }
+   
+   
+    bool LookupAndHandle (const KeyT& key, const int indx) {
         hashmap_iter elem = hashmap_.find(key);
 
         if (elem == hashmap_.end()) {
-            HandleNewItem (key);
+            HandleNewItem (key, indx);
             return false;
         } else {
             hitcount_++;
             return true;
         }
-    }
-
-
-    void RunCache () {
-        for (auto cur = input_data_.begin(), end = input_data_.end(); cur != end; ++cur) {
-            LookupAndHandle(*cur);
-            // Dump ();
-        }
-
-        std::cout << hitcount_ << '\n';
     }
 
 
@@ -106,9 +108,9 @@ public:
 
 
 private:
-    void HandleNewItem (const KeyT& key) {
+    void HandleNewItem (const KeyT& key, const size_type indx) {
         if (IsFull()) {
-            DeleteLeastFreqNaive ();
+            DeleteLeastFreqNaive (key, indx);
             // DeleteLeastFreq ();
         }
         cache_.emplace_front(key);
@@ -117,43 +119,42 @@ private:
 
 
     void DeleteLeastFreq () {
-        auto elem_to_delete = std::prev(cache_.end());
+        // if (input_data_.)
+        
+        // auto elem_to_delete = std::prev(cache_.end());
 
-        for (auto cur_elem = cache_.begin(), end = cache_.end(); cur_elem != end; ++cur_elem) {
-            if (hashmap_.find (cur_elem->key_) != hashmap_.end()) {
-                if (help_buffer_.find(cur_elem->key_) != help_buffer_.end())
-                    elem_to_delete = cur_elem;
-                help_buffer_.insert(cur_elem->key_);
-            }
-        }
-
-        // std::cout << "\tElem to delete: " << elem_to_delete->key_ << '\n';
-
-        help_buffer_.clear();
-        hashmap_.erase(elem_to_delete->key_);
-        cache_.erase(elem_to_delete);
     }
 
 
-    void DeleteLeastFreqNaive() {
-        auto elem_to_delete = std::prev(cache_.end());
-        for (auto cur_elem = cache_.begin(), end = cache_.end(); cur_elem != end; ++cur_elem) {
-            // It used to be -INT_MAX, pretty funny
-            int max_dist = INT_MIN;
-            
-            int counter = 0;
-            for (auto input_elem = input_data_.begin(), end = input_data_.end(); input_elem != end; ++input_elem) {
-                if (*input_elem == cur_elem->key_) {
-                    if (counter > max_dist) {
-                        elem_to_delete = cur_elem;
-                        max_dist = counter;
-                    }
-                    break;
-                }
-                counter++;
-            }
+    void DeleteLeastFreqNaive(const KeyT& key, const size_type indx) {
+        
+        size_type max_new_dist = 0;
+        for (size_type i = indx + 1; i < input_data_.size(); i++) {
+            if (input_data_[i] == key)
+                max_new_dist = i - indx;
         }
 
+        std::cout << "Max distance: " << max_new_dist << '\n';
+        // No need to insert this item
+        if (max_new_dist == 0)
+            return;
+
+        auto elem_to_delete = std::prev (cache_.end());
+        for (auto cache_iter = cache_.begin(), end = cache_.end();
+             cache_iter != end; ++cache_iter) {
+
+            for (auto cur_cache_iter = std::next(cache_iter); cur_cache_iter != cache_.end(); ++cur_cache_iter) {
+                if (cur_cache_iter->key_ == cache_iter->key_) {
+                    size_type cur_dist = std::distance(cache_iter, cur_cache_iter);
+                    if (cur_dist > max_new_dist) {
+                        elem_to_delete = cache_iter;
+                        max_new_dist = cur_dist;
+                    }
+
+                }
+            }
+        }
+        
         hashmap_.erase(elem_to_delete->key_);
         cache_.erase(elem_to_delete);
     }

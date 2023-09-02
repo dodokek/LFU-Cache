@@ -2,7 +2,7 @@
 
 ## Overview 
 
-Here is my 2 different implementations of LFU cache and implementation of "Perfect" cache(Cache, awared of future queries).
+Here are my 2 different implementations of LFU cache and implementation of "Perfect" cache(Cache, awared of future queries).
 
 ## Build
 
@@ -21,7 +21,7 @@ You will get three executables:
 
 In this repository you can also find Python script for test generation and Shellscript for answers generation.
 
-You can generate any amount(10 as example) of tests by:
+You can generate any amount (10 as example) of tests by:
 ```shell
 mkdir tests
 ./test_get/gen_tests.py
