@@ -12,6 +12,6 @@ set(INCLUDE_DIR ./include/)
 message(STATUS "Building project...")
 
 target_include_directories(LFU_hashmap PUBLIC "${INCLUDE_DIR}")
-target_include_directories(LFU_cringe PUBLIC "${INCLUDE_DIR}")
+target_include_directories(LFU_slow PUBLIC "${INCLUDE_DIR}")
 target_include_directories(perfect_cache PUBLIC "${INCLUDE_DIR}")
 

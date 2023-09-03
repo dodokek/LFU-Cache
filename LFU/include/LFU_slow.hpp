@@ -1,5 +1,5 @@
-#ifndef LFU_CRINGE
-#define LFU_CRINGE
+#ifndef LFU_SLOW
+#define LFU_SLOW
 
 #include <algorithm>
 #include <utility>
@@ -105,6 +105,6 @@ public:
     }
 }; 
 
-} // LFU_CACHE
+} // namesoace LFU_CACHE
 
-#endif // #ifdef LFU_CRINGE
+#endif // #ifdef LFU_SLOW

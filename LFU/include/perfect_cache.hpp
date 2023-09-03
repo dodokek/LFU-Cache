@@ -10,6 +10,9 @@
 #include <unordered_set>
 #include <iostream>
 #include <iterator>
+#include <typeinfo>
+#include <assert.h>
+#include <type_traits>
 
 
 namespace PERFECT_CACHE
@@ -57,11 +60,11 @@ public:
              cur != end; ++cur, ++indx) {
             hashmap_[*cur].push_front(indx);
         }
+
         
         for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
              cur != end; ++cur, ++indx) {
             LookupAndHandle(*cur, indx);
-            // Dump ();
         }
 
         std::cout << hitcount_ << '\n';
@@ -116,18 +119,15 @@ private:
              cur_elem != end; ++cur_elem, ++counter) {
 
             size_type new_distance = hashmap_[cur_elem->key_].back() - indx;
-            // std::cout << "Id of next candidate: " << hashmap_[cur_elem->key_].back() << " Key: "<< cur_elem->key_<<'\n';
             if (new_distance > max_new_dist) {
                 id_item_to_delete = counter;
                 max_new_dist = new_distance;
             }
-            // std::cerr << "Cur id to del: " << id_item_to_delete << '\n';
         }
 
-        // std::cout << "id to del: " << id_item_to_delete << " max dist: " << max_new_dist << '\n';
-
         auto elem_to_del = cache_.begin();
-        std::advance(elem_to_del, id_item_to_delete);        
+        std::advance(elem_to_del, id_item_to_delete);   
+        key_checklist_.erase(elem_to_del->key_);
         cache_.erase(elem_to_del);
 
         return true;
@@ -154,15 +154,15 @@ private:
                     if (new_distance > max_new_dist) {
                         id_item_to_delete = i;
                         max_new_dist = new_distance;
+                        // std::cout 
                     }
                 }
             }
         }
 
-        // std::cout << "id to del: " << id_item_to_delete << " max dist: " << max_new_dist << '\n';
-
         auto elem_to_del = cache_.begin();
         std::advance(elem_to_del, id_item_to_delete);        
+        key_checklist_.erase(elem_to_del->key_);
         cache_.erase(elem_to_del);
 
         return true;
@@ -192,17 +192,17 @@ public:
 }; // End class Perfect Cache
 
 template <typename KeyT>
-void GetInput (size_t& input_size, std::vector<int>& input_data) {
+void GetInput (std::istream& istream, size_t& input_size, std::vector<int>& input_data) {
     
-        std::cin >> input_size;
-        if (!std::cin.good())
+        istream >> input_size;
+        if (!istream.good())
                 throw std::runtime_error{"Bad input: wrong input size"};
 
         for (size_t i = 0 ; i < input_size; i++) {
             KeyT new_elem;
-            std::cin >> new_elem;
+            istream >> new_elem;
 
-            if (!std::cin.good())
+            if (!istream.good())
                 throw std::runtime_error{"Bad input: wrong Key"};
             
             input_data.push_back(new_elem);

@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "LFU_cringe.hpp"
+#include "LFU_slow.hpp"
 
 int main()
 {

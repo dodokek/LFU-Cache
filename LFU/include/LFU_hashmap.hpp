@@ -121,6 +121,6 @@ public:
     }
 }; 
 
-} // LFU_CACHE
+} // namespace LFU_CACHE
 
 #endif // #ifdef LFU_HASHMAP
