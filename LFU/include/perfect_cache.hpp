@@ -2,6 +2,8 @@
 #define PERFECT_HPP
 
 #include <climits>
+#include <cstddef>
+#include <deque>
 #include <unordered_map>
 #include <list>
 #include <vector>
@@ -21,7 +23,7 @@ class PerfectCache final
 public:    
     using cache_iterator = typename std::list<LFU_ELEM>::iterator;
     using size_type      = typename std::vector<LFU_ELEM>::size_type;
-    using hashmap_iter   = typename std::unordered_map<KeyT, cache_iterator>::iterator;
+    using hashmap_iter   = typename std::unordered_map<KeyT, std::deque<KeyT>>::iterator;
 
 private:
     struct LFU_ELEM
@@ -35,39 +37,31 @@ private:
 
 
     std::list<LFU_ELEM> cache_; // Main cache
-    std::unordered_map<KeyT, cache_iterator> hashmap_; // Hashmap to find elems in main cache
-    std::unordered_set<KeyT>  help_buffer_;  // Set to check if element was already found
-    std::vector<KeyT> input_data_;
+    std::unordered_map<KeyT, std::deque<size_type>> hashmap_; // Hashmap to find elems in main cache
+    std::unordered_set<KeyT> key_checklist_;
 
-    size_type input_size_;
     size_type capacity_;
+    size_type input_size_;
     int hitcount_ = 0;
 
+    std::vector<KeyT>& input_data_;
+
 public:
-    PerfectCache (size_type capacity) : capacity_(capacity) {
+    PerfectCache (size_type capacity, size_type input_size, std::vector<KeyT>& input_data) 
+    : capacity_(capacity), input_size_(input_size), input_data_(input_data) {
         input_data_.reserve(capacity);
     }
- 
-    void GetInput () {
-        std::cin >> input_size_;
-
-        for (size_type i = 0 ; i < input_size_; i++) {
-            KeyT new_elem;
-            std::cin >> new_elem;
-
-            if (!std::cin.good())
-                throw std::runtime_error{"Bad input: wrong Key"};
-            
-            input_data_.push_back(new_elem);
-        }
-    }
-
 
     void RunCache () {
         for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
              cur != end; ++cur, ++indx) {
+            hashmap_[*cur].push_front(indx);
+        }
+        
+        for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
+             cur != end; ++cur, ++indx) {
             LookupAndHandle(*cur, indx);
-            Dump ();
+            // Dump ();
         }
 
         std::cout << hitcount_ << '\n';
@@ -75,19 +69,108 @@ public:
    
    
     bool LookupAndHandle (const KeyT& key, const int indx) {
-        hashmap_iter elem = hashmap_.find(key);
-
-        if (elem == hashmap_.end()) {
+        if (key_checklist_.find(key) == key_checklist_.end()) {
             HandleNewItem (key, indx);
+            key_checklist_.emplace(key);
+
+            DeleteRecentElem(key);
             return false;
         } else {
             hitcount_++;
+            DeleteRecentElem(key);
             return true;
+        }   
+    }
+
+private:
+    void DeleteRecentElem (const KeyT& key) {
+        hashmap_[key].pop_back();
+        if (hashmap_[key].empty()) {
+            hashmap_.erase(key);
         }
     }
 
+    void HandleNewItem (const KeyT& key, const size_type indx) {
+        if (IsFull()) {
+            if (DeleteLeastFreq (key, indx) == false)
+                return;
+        }
+        cache_.emplace_front(key);
+        hashmap_[key].push_front(indx);
+    }
 
+
+    bool DeleteLeastFreq (const KeyT& key, const size_type indx) {
+
+        if (hashmap_[key].size() == 1)
+            return false;
+
+        size_type max_new_dist = 0;
+        for (size_type i = indx + 1; i < input_size_; i++) {
+            if (input_data_[i] == key)
+                max_new_dist = i - indx;
+        }
+
+        size_type id_item_to_delete = 0;
+        for (auto cur_elem = cache_.begin(), end = cache_.end(), counter = 0;
+             cur_elem != end; ++cur_elem, ++counter) {
+
+            size_type new_distance = hashmap_[cur_elem->key_].back() - indx;
+            // std::cout << "Id of next candidate: " << hashmap_[cur_elem->key_].back() << " Key: "<< cur_elem->key_<<'\n';
+            if (new_distance > max_new_dist) {
+                id_item_to_delete = counter;
+                max_new_dist = new_distance;
+            }
+            // std::cerr << "Cur id to del: " << id_item_to_delete << '\n';
+        }
+
+        // std::cout << "id to del: " << id_item_to_delete << " max dist: " << max_new_dist << '\n';
+
+        auto elem_to_del = cache_.begin();
+        std::advance(elem_to_del, id_item_to_delete);        
+        cache_.erase(elem_to_del);
+
+        return true;
+    }
+
+
+    bool DeleteLeastFreqNaive(const KeyT& key, const size_type indx) {
+        
+        size_type max_new_dist = 0;
+        for (size_type i = indx + 1; i < input_size_; i++) {
+            if (input_data_[i] == key)
+                max_new_dist = i - indx;
+        }
+
+        // No need to insert this item
+        if (max_new_dist == 0)
+            return false;
+
+        size_type id_item_to_delete = *key_checklist_.begin();
+        for (size_type i = 0; i < input_size_; i++) {
+            for (size_type j = i + 1; j < input_size_; j++) {
+                if (input_data_[i] == input_data_[j] || j == input_size_ - 1) {
+                    size_type new_distance = j - i + indx;
+                    if (new_distance > max_new_dist) {
+                        id_item_to_delete = i;
+                        max_new_dist = new_distance;
+                    }
+                }
+            }
+        }
+
+        // std::cout << "id to del: " << id_item_to_delete << " max dist: " << max_new_dist << '\n';
+
+        auto elem_to_del = cache_.begin();
+        std::advance(elem_to_del, id_item_to_delete);        
+        cache_.erase(elem_to_del);
+
+        return true;
+    }
+
+public:
     void Dump () const {
+
         std::cout << "------- Dump of Class: LFU -------\n";
         std::cout << "Capacity: " << capacity_     << "\n";
         std::cout << "Size: "     << cache_.size() << "\n";
@@ -106,60 +189,25 @@ public:
         return cache_.size() == capacity_;
     }
 
+}; // End class Perfect Cache
 
-private:
-    void HandleNewItem (const KeyT& key, const size_type indx) {
-        if (IsFull()) {
-            DeleteLeastFreqNaive (key, indx);
-            // DeleteLeastFreq ();
+template <typename KeyT>
+void GetInput (size_t& input_size, std::vector<int>& input_data) {
+    
+        std::cin >> input_size;
+        if (!std::cin.good())
+                throw std::runtime_error{"Bad input: wrong input size"};
+
+        for (size_t i = 0 ; i < input_size; i++) {
+            KeyT new_elem;
+            std::cin >> new_elem;
+
+            if (!std::cin.good())
+                throw std::runtime_error{"Bad input: wrong Key"};
+            
+            input_data.push_back(new_elem);
         }
-        cache_.emplace_front(key);
-        hashmap_[key] = std::next (cache_.begin());
     }
-
-
-    void DeleteLeastFreq () {
-        // if (input_data_.)
-        
-        // auto elem_to_delete = std::prev(cache_.end());
-
-    }
-
-
-    void DeleteLeastFreqNaive(const KeyT& key, const size_type indx) {
-        
-        size_type max_new_dist = 0;
-        for (size_type i = indx + 1; i < input_data_.size(); i++) {
-            if (input_data_[i] == key)
-                max_new_dist = i - indx;
-        }
-
-        std::cout << "Max distance: " << max_new_dist << '\n';
-        // No need to insert this item
-        if (max_new_dist == 0)
-            return;
-
-        auto elem_to_delete = std::prev (cache_.end());
-        for (auto cache_iter = cache_.begin(), end = cache_.end();
-             cache_iter != end; ++cache_iter) {
-
-            for (auto cur_cache_iter = std::next(cache_iter); cur_cache_iter != cache_.end(); ++cur_cache_iter) {
-                if (cur_cache_iter->key_ == cache_iter->key_) {
-                    size_type cur_dist = std::distance(cache_iter, cur_cache_iter);
-                    if (cur_dist > max_new_dist) {
-                        elem_to_delete = cache_iter;
-                        max_new_dist = cur_dist;
-                    }
-
-                }
-            }
-        }
-        
-        hashmap_.erase(elem_to_delete->key_);
-        cache_.erase(elem_to_delete);
-    }
-
-};
 
 } // namespace PERFECT_CACHE
 

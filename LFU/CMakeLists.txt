@@ -3,7 +3,7 @@ set(CMAKE_CXX_FLAGS "-Wall")
 
 project(LFU)
 
-add_executable(LFU_cringe LFU_cringe.cpp)
+add_executable(LFU_slow LFU_slow.cpp)
 add_executable(LFU_hashmap LFU_hashmap.cpp)
 add_executable(perfect_cache perfect_cache.cpp)
 
