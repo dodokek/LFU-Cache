@@ -17,6 +17,16 @@
 
 namespace PERFECT_CACHE
 {
+// #define FAST_VERSION
+
+// #define DBG
+#ifdef DBG
+    #define dbg_cout(X) std::cout X;
+    #define DBG__(X) X
+#else
+    #define dbg_cout(X) ;
+    #define DBG__(X) ;
+#endif
 
 template<typename KeyT, typename PageT>
 class PerfectCache final
@@ -64,71 +74,96 @@ public:
         
         for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
              cur != end; ++cur, ++indx) {
+            dbg_cout( << "==Incoming key: " << *cur << '\n');
+            DeleteRecentElem(*cur);
             LookupAndHandle(*cur, indx);
+            DBG__(Dump());
         }
 
         std::cout << hitcount_ << '\n';
     }
    
    
-    bool LookupAndHandle (const KeyT& key, const int indx) {
-        if (key_checklist_.find(key) == key_checklist_.end()) {
-            HandleNewItem (key, indx);
-            key_checklist_.emplace(key);
-
-            DeleteRecentElem(key);
-            return false;
-        } else {
-            hitcount_++;
-            DeleteRecentElem(key);
-            return true;
-        }   
-    }
-
 private:
     void DeleteRecentElem (const KeyT& key) {
+        dbg_cout( << "+++Deleting item " << hashmap_[key].back() << " Key: " << key  << '\n');
         hashmap_[key].pop_back();
+    
         if (hashmap_[key].empty()) {
             hashmap_.erase(key);
         }
     }
 
+
+    bool LookupAndHandle (const KeyT& key, const int indx) {
+        if (key_checklist_.find(key) == key_checklist_.end()) {
+            HandleNewItem (key, indx);
+            return false;
+        } else {
+            hitcount_++;
+            return true;
+        }   
+    }
+
+   
     void HandleNewItem (const KeyT& key, const size_type indx) {
+
         if (IsFull()) {
+            #ifdef FAST_VERSION
             if (DeleteLeastFreq (key, indx) == false)
                 return;
+            #else
+            if (DeleteLeastFreqNaive (key, indx) == false)
+                return;
+            #endif
         }
+
+        key_checklist_.emplace(key);
         cache_.emplace_front(key);
-        hashmap_[key].push_front(indx);
     }
 
 
     bool DeleteLeastFreq (const KeyT& key, const size_type indx) {
 
-        if (hashmap_[key].size() == 1)
+        dbg_cout( << "Amount of same elems ahead: " << hashmap_[key].size() << '\n');
+        if (hashmap_[key].size() == 0) {
+            dbg_cout( << "Incoming item is unique\n");
             return false;
+        }
 
         size_type max_new_dist = 0;
         for (size_type i = indx + 1; i < input_size_; i++) {
-            if (input_data_[i] == key)
-                max_new_dist = i - indx;
+            if (input_data_[i] == key) {
+                max_new_dist = i;
+                dbg_cout( << "Equal with indx: " << i << " Value: " << key << '\n');
+                break;
+            }
         }
+        auto new_dist_save = max_new_dist;
+        dbg_cout(<< "Max dist: " << max_new_dist << '\n');
 
-        size_type id_item_to_delete = 0;
-        for (auto cur_elem = cache_.begin(), end = cache_.end(), counter = 0;
-             cur_elem != end; ++cur_elem, ++counter) {
+        auto item_to_delete = cache_.begin();
+        for (auto cur_elem = cache_.begin(), end = cache_.end();
+             cur_elem != end; ++cur_elem) {
 
-            size_type new_distance = hashmap_[cur_elem->key_].back() - indx;
-            if (new_distance > max_new_dist) {
-                id_item_to_delete = counter;
-                max_new_dist = new_distance;
+            if (hashmap_[cur_elem->key_].size() == 0) {
+                item_to_delete = cur_elem;
+                dbg_cout( << "Deleting unique item\n");
+                break;
+            }
+
+            if (hashmap_[cur_elem->key_].back() > max_new_dist) {
+                max_new_dist = hashmap_[cur_elem->key_].back();
+                item_to_delete = cur_elem;
+                dbg_cout( << "Max new distance: " << max_new_dist << '\n');
             }
         }
 
-        auto elem_to_del = cache_.begin();
-        std::advance(elem_to_del, id_item_to_delete);   
-        key_checklist_.erase(elem_to_del->key_);
-        cache_.erase(elem_to_del);
+        if (new_dist_save == max_new_dist)
+            return false;
+
+        key_checklist_.erase(item_to_delete->key_);
+        cache_.erase(item_to_delete);
 
         return true;
     }
@@ -138,27 +173,36 @@ private:
         
         size_type max_new_dist = 0;
         for (size_type i = indx + 1; i < input_size_; i++) {
-            if (input_data_[i] == key)
-                max_new_dist = i - indx;
+            if (input_data_[i] == key) {
+                max_new_dist = i;
+                dbg_cout( << "Equal with indx: " << i << " Value: " << key << '\n');
+                break;
+            }
         }
 
+        auto new_dist_save = max_new_dist;
+        dbg_cout( << "\tMax new dist: " << max_new_dist << '\n');
         // No need to insert this item
         if (max_new_dist == 0)
             return false;
 
         size_type id_item_to_delete = *key_checklist_.begin();
-        for (size_type i = 0; i < input_size_; i++) {
-            for (size_type j = i + 1; j < input_size_; j++) {
-                if (input_data_[i] == input_data_[j] || j == input_size_ - 1) {
-                    size_type new_distance = j - i + indx;
+        for (auto cache_iter = cache_.begin(), end = cache_.end(); cache_iter != end; ++cache_iter) {
+            for (size_type i = indx + 1; i < input_size_; i++) {
+                if (input_data_[i] == cache_iter->key_) {
+                    size_type new_distance = i;
+                    dbg_cout( << "Indx: " << i << " Key: " << cache_iter->key_ << " Distance: " << new_distance << '\n');
                     if (new_distance > max_new_dist) {
                         id_item_to_delete = i;
                         max_new_dist = new_distance;
-                        // std::cout 
                     }
+                    break;
                 }
             }
         }
+
+        if (max_new_dist == new_dist_save) 
+            return false;
 
         auto elem_to_del = cache_.begin();
         std::advance(elem_to_del, id_item_to_delete);        
@@ -178,7 +222,7 @@ public:
         std::cout << "Elements in cache: \n";
 
         for (auto elem : cache_) {
-            std::cout << "Key: " << elem.key_ << '\n';
+            // std::cout << "Key: " << elem.key_ << '\n';
         }
 
         std::cout << "------- End of dump --------------\n";   

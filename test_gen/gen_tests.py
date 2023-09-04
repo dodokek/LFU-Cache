@@ -20,7 +20,7 @@ def generate_test(filename, tests_amount):
     
 
 def start_generation():
-    tests_amount = int(input())
+    tests_amount = 10
 
     for test in range(tests_amount):
         print ("Generating test:", test + 1)

@@ -21,6 +21,16 @@ You will get three executables:
 
 In this repository you can also find Python script for test generation and Shellscript for answers generation.
 
+### Script for compilation and comparison with perfect caching
+
+To compile LFU_hashmap and compare its performance with Perfect cache, enter the following command:
+```bash
+# --------------------v Any project name could be here
+./test_gen/test_and_compare.sh LFU_hashmap
+```
+
+### Scripts explanation
+
 You can generate any amount (10 as example) of tests by:
 ```shell
 mkdir tests
@@ -41,6 +51,8 @@ To compare answers, you need to execute the following script
 ./compare.sh <tests_amount> <path_to_ans1_folder> <path_to_ans2_folder>
 # example: ./compare.sh 9 ./tests/perfect ./tests/native
 ```
+
+
 
 ## Conclusion
 
