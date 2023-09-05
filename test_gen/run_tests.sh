@@ -6,7 +6,7 @@
 
 if [ "$1" ]; then
     # building project
-    make --directory=../LFU/build
+    make --directory=../Cache/build
 
     # performing tests
     echo "Performing $1 tests"
