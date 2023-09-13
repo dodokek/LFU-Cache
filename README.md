@@ -25,7 +25,7 @@ In this repository you can also find Python script for test generation and Shell
 
 To compile LFU_hashmap and compare its performance with Perfect cache, enter the following command:
 ```bash
-# --------------------v Any project name could be here
+# -----------------------------v Any project name could be here
 ./test_gen/test_and_compare.sh LFU_hashmap
 ```
 

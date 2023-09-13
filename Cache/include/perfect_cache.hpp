@@ -17,16 +17,6 @@
 
 namespace PERFECT_CACHE
 {
-#define FAST_VERSION
-
-#define DBG
-#ifdef DBG
-    #define dbg_cout(X) std::cout X;
-    #define DBG__(X) X
-#else
-    #define dbg_cout(X) ;
-    #define DBG__(X) ;
-#endif
 
 template<typename KeyT, typename PageT>
 class PerfectCache final
@@ -65,20 +55,23 @@ public:
         input_data_.reserve(capacity);
     }
 
+    // Function, which simulates the work of cache, by
+    // sending lookup queries using input data.
+    
     void RunCache () {
+
+        // Filling hashmap to find furthes values
         for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
              cur != end; ++cur, ++indx) {
             hashmap_[*cur].push_back(indx);
         }
 
+        // Iterating through input data and calling cache.
         for (auto cur = input_data_.begin(), end = input_data_.end(); cur != end; ++cur) {
-            //if element not in cache
             if (key_checklist_.find(*cur) == key_checklist_.end()) {
-                //if elem is the only one -> don't insert it in the cache
-                if (hashmap_[*cur].size() == 1) {
+                if (hashmap_[*cur].size() == 1)
                     continue;
-                }
-                // remember new cache element
+                
                 key_checklist_.insert(*cur);
                 if (IsFull()) {
                     auto replace_iter = FindFurthest();
@@ -92,24 +85,31 @@ public:
             } else {
                 ++hitcount_;
             }
-            //after pushing elem to cache we don't need it in hash_table
+
             RemoveUsedElem(*cur);
+        }
     }
 
-        std::cout << hitcount_ << '\n';
+
+    int GetHitcountInfo() {
+        return hitcount_;
     }
 
    
 private:
+
+    // Function, which findes the furthest value
+    // This means that Its deleting will cause least cache misses
+
     cache_iterator FindFurthest() {
-        size_type max_distance = 0;
         cache_iterator replace_iter{};
+        size_type max_distance = 0;
+
         for (auto cache_iter = cache_.begin(); cache_iter != cache_.end(); ++cache_iter) {
-            //if value with such key was not found in buffer --> replace it
             if (hashmap_.find(cache_iter->key_) != hashmap_.end()) {
-                auto deque_iter = hashmap_[cache_iter->key_].begin();
-                if (*deque_iter > max_distance) {
-                    max_distance = *deque_iter;
+                auto nearest_elem_pos = hashmap_[cache_iter->key_].begin();
+                if (*nearest_elem_pos > max_distance) {
+                    max_distance = *nearest_elem_pos;
                     replace_iter = cache_iter;
                 }
             } else {
@@ -121,6 +121,9 @@ private:
     }
 
 
+    // After we passed throught input elem, we must delete it 
+    // from hash table
+
     void RemoveUsedElem (KeyT& key) {
         hashmap_[key].pop_front();
         if (hashmap_[key].empty()) {
@@ -128,7 +131,6 @@ private:
         }
     }
   
-
 
 public:
     void Dump () const {
@@ -153,6 +155,8 @@ public:
 
 }; // End class Perfect Cache
 
+
+// Separate function for input, because I don't want to make Cache depend on istream
 template <typename KeyT>
 void GetInput (std::istream& istream, size_t& input_size, std::vector<int>& input_data) {
     

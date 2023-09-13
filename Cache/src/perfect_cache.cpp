@@ -15,4 +15,6 @@ int main()
 
     PERFECT_CACHE::PerfectCache<int, int> cache_instance(cache_capactiy, input_size, input_data);
     cache_instance.RunCache();
+
+    std::cout << cache_instance.GetHitcountInfo() << '\n';
 }
