@@ -8,12 +8,12 @@ Here are my 2 different implementations of LFU cache and implementation of "Perf
 
 To build the project, you need to execute the following commands:
 ```shell
-cd LFU
+cd Cache
 mkdir build
 cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 make --directory=build
 ```
-You will get three executables:
+You will executables:
 - LFU_hashmap - O(1) realisation of LFU
 - perfect_cache - realisation of perfect cache
 
@@ -25,7 +25,7 @@ In this repository you can also find Python script for test generation and Shell
 
 To compile LFU_hashmap and compare its performance with Perfect cache, enter the following command:
 ```bash
-# -----------------------------v Any project name could be here
+# -----------------------------v Any executable name could be here
 ./test_gen/test_and_compare.sh LFU_hashmap
 ```
 
