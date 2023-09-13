@@ -16,8 +16,13 @@ while [ "$i" -lt $tests_amount ]; do
     if [ $comp_value -eq 1 ]
     then
         echo "Answers are different"
+        echo "Native answer: "
+        cat $3/ans_$i.txt
+        echo "Perfect cache answer: "
+        cat $2/ans_$i.txt
     else
         echo "Answers are the same"
     fi
+    echo "========================"
     
 done

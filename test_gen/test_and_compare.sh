@@ -8,11 +8,21 @@ python3 ./gen_tests.py
 
 # Performing tests on $1 
 
+echo "============== --------------- =============="
+echo "============== Native  caching =============="
+echo "============== --------------- =============="
+
+
 ./run_tests.sh $tests_amount $1
 
+
 # Performing tests on perfect cache
+echo "============== --------------- =============="
+echo "============== Perfect caching =============="
+echo "============== --------------- =============="
 
 ./run_tests.sh $tests_amount perfect_cache
+
 
 # Compating results
 

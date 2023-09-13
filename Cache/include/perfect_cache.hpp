@@ -17,9 +17,9 @@
 
 namespace PERFECT_CACHE
 {
-// #define FAST_VERSION
+#define FAST_VERSION
 
-// #define DBG
+#define DBG
 #ifdef DBG
     #define dbg_cout(X) std::cout X;
     #define DBG__(X) X
@@ -31,25 +31,25 @@ namespace PERFECT_CACHE
 template<typename KeyT, typename PageT>
 class PerfectCache final
 {
-    struct LFU_ELEM;
+    struct CACHE_ELEM;
 
 public:    
-    using cache_iterator = typename std::list<LFU_ELEM>::iterator;
-    using size_type      = typename std::vector<LFU_ELEM>::size_type;
+    using cache_iterator = typename std::list<CACHE_ELEM>::iterator;
+    using size_type      = typename std::vector<CACHE_ELEM>::size_type;
     using hashmap_iter   = typename std::unordered_map<KeyT, std::deque<KeyT>>::iterator;
 
 private:
-    struct LFU_ELEM
+    struct CACHE_ELEM
     {
         PageT          page_;
         KeyT           key_;
 
-        LFU_ELEM (KeyT key) 
+        CACHE_ELEM (KeyT key) 
             : key_(key) {};
     };
 
 
-    std::list<LFU_ELEM> cache_; // Main cache
+    std::list<CACHE_ELEM> cache_; // Main cache
     std::unordered_map<KeyT, std::deque<size_type>> hashmap_; // Hashmap to find elems in main cache
     std::unordered_set<KeyT> key_checklist_;
 
@@ -68,149 +68,67 @@ public:
     void RunCache () {
         for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
              cur != end; ++cur, ++indx) {
-            hashmap_[*cur].push_front(indx);
+            hashmap_[*cur].push_back(indx);
         }
 
-        
-        for (auto cur = input_data_.begin(), end = input_data_.end(), indx = 0;
-             cur != end; ++cur, ++indx) {
-            dbg_cout( << "==Incoming key: " << *cur << '\n');
-            DeleteRecentElem(*cur);
-            LookupAndHandle(*cur, indx);
-            DBG__(Dump());
-        }
+        for (auto cur = input_data_.begin(), end = input_data_.end(); cur != end; ++cur) {
+            //if element not in cache
+            if (key_checklist_.find(*cur) == key_checklist_.end()) {
+                //if elem is the only one -> don't insert it in the cache
+                if (hashmap_[*cur].size() == 1) {
+                    continue;
+                }
+                // remember new cache element
+                key_checklist_.insert(*cur);
+                if (IsFull()) {
+                    auto replace_iter = FindFurthest();
+                    
+                    key_checklist_.erase(replace_iter->key_);
+                    *replace_iter = {*cur};
+
+                } else {
+                    cache_.emplace_back(*cur);
+                }
+            } else {
+                ++hitcount_;
+            }
+            //after pushing elem to cache we don't need it in hash_table
+            RemoveUsedElem(*cur);
+    }
 
         std::cout << hitcount_ << '\n';
     }
-   
+
    
 private:
-    void DeleteRecentElem (const KeyT& key) {
-        dbg_cout( << "+++Deleting item " << hashmap_[key].back() << " Key: " << key  << '\n');
-        hashmap_[key].pop_back();
-    
+    cache_iterator FindFurthest() {
+        size_type max_distance = 0;
+        cache_iterator replace_iter{};
+        for (auto cache_iter = cache_.begin(); cache_iter != cache_.end(); ++cache_iter) {
+            //if value with such key was not found in buffer --> replace it
+            if (hashmap_.find(cache_iter->key_) != hashmap_.end()) {
+                auto deque_iter = hashmap_[cache_iter->key_].begin();
+                if (*deque_iter > max_distance) {
+                    max_distance = *deque_iter;
+                    replace_iter = cache_iter;
+                }
+            } else {
+                replace_iter = cache_iter;
+                break;
+            }
+        }
+        return replace_iter;
+    }
+
+
+    void RemoveUsedElem (KeyT& key) {
+        hashmap_[key].pop_front();
         if (hashmap_[key].empty()) {
             hashmap_.erase(key);
         }
     }
+  
 
-
-    bool LookupAndHandle (const KeyT& key, const int indx) {
-        if (key_checklist_.find(key) == key_checklist_.end()) {
-            HandleNewItem (key, indx);
-            return false;
-        } else {
-            hitcount_++;
-            return true;
-        }   
-    }
-
-   
-    void HandleNewItem (const KeyT& key, const size_type indx) {
-
-        if (IsFull()) {
-            #ifdef FAST_VERSION
-            if (DeleteLeastFreq (key, indx) == false)
-                return;
-            #else
-            if (DeleteLeastFreqNaive (key, indx) == false)
-                return;
-            #endif
-        }
-
-        key_checklist_.emplace(key);
-        cache_.emplace_front(key);
-    }
-
-
-    bool DeleteLeastFreq (const KeyT& key, const size_type indx) {
-
-        dbg_cout( << "Amount of same elems ahead: " << hashmap_[key].size() << '\n');
-        if (hashmap_[key].size() == 0) {
-            dbg_cout( << "Incoming item is unique\n");
-            return false;
-        }
-
-        size_type max_new_dist = 0;
-        for (size_type i = indx + 1; i < input_size_; i++) {
-            if (input_data_[i] == key) {
-                max_new_dist = i;
-                dbg_cout( << "Equal with indx: " << i << " Value: " << key << '\n');
-                break;
-            }
-        }
-        auto new_dist_save = max_new_dist;
-        dbg_cout(<< "Max dist: " << max_new_dist << '\n');
-
-        auto item_to_delete = cache_.begin();
-        for (auto cur_elem = cache_.begin(), end = cache_.end();
-             cur_elem != end; ++cur_elem) {
-
-            if (hashmap_[cur_elem->key_].size() == 0) {
-                item_to_delete = cur_elem;
-                dbg_cout( << "Deleting unique item\n");
-                break;
-            }
-
-            if (hashmap_[cur_elem->key_].back() > max_new_dist) {
-                max_new_dist = hashmap_[cur_elem->key_].back();
-                item_to_delete = cur_elem;
-                dbg_cout( << "Max new distance: " << max_new_dist << '\n');
-            }
-        }
-
-        if (new_dist_save == max_new_dist)
-            return false;
-
-        key_checklist_.erase(item_to_delete->key_);
-        cache_.erase(item_to_delete);
-
-        return true;
-    }
-
-
-    bool DeleteLeastFreqNaive(const KeyT& key, const size_type indx) {
-        
-        size_type max_new_dist = 0;
-        for (size_type i = indx + 1; i < input_size_; i++) {
-            if (input_data_[i] == key) {
-                max_new_dist = i;
-                dbg_cout( << "Equal with indx: " << i << " Value: " << key << '\n');
-                break;
-            }
-        }
-
-        auto new_dist_save = max_new_dist;
-        dbg_cout( << "\tMax new dist: " << max_new_dist << '\n');
-        // No need to insert this item
-        if (max_new_dist == 0)
-            return false;
-
-        size_type id_item_to_delete = *key_checklist_.begin();
-        for (auto cache_iter = cache_.begin(), end = cache_.end(); cache_iter != end; ++cache_iter) {
-            for (size_type i = indx + 1; i < input_size_; i++) {
-                if (input_data_[i] == cache_iter->key_) {
-                    size_type new_distance = i;
-                    dbg_cout( << "Indx: " << i << " Key: " << cache_iter->key_ << " Distance: " << new_distance << '\n');
-                    if (new_distance > max_new_dist) {
-                        id_item_to_delete = i;
-                        max_new_dist = new_distance;
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (max_new_dist == new_dist_save) 
-            return false;
-
-        auto elem_to_del = cache_.begin();
-        std::advance(elem_to_del, id_item_to_delete);        
-        key_checklist_.erase(elem_to_del->key_);
-        cache_.erase(elem_to_del);
-
-        return true;
-    }
 
 public:
     void Dump () const {
@@ -222,7 +140,7 @@ public:
         std::cout << "Elements in cache: \n";
 
         for (auto elem : cache_) {
-            // std::cout << "Key: " << elem.key_ << '\n';
+            std::cout << "Key: " << elem.key_ << '\n';
         }
 
         std::cout << "------- End of dump --------------\n";   
