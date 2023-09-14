@@ -48,7 +48,7 @@ private:
 
 public:
     LFU (size_type capacity) : capacity_(capacity) {
-        auto first_elem = cache_.emplace_back (1);
+        cache_.emplace_back (1);
     }
 
     bool LookupAndHandle(const KeyT& key) {
