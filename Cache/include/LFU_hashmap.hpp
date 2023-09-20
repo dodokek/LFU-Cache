@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 
-namespace LFU_CACHE
+namespace LFU_CACHE_FAST
 {
 
 template<typename KeyT, typename PageT>

@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-namespace LFU_CACHE
+namespace LFU_CACHE_SLOW
 {
 
 template<typename KeyT, typename PageT>
@@ -19,7 +19,10 @@ class LFU final {
         long int hit_count;
 
         LFU_ELEM (KeyT key) 
-            : key(key) {};
+            : key(key) {
+            hit_count = 0;
+            page = 0;
+        };
     };
     
     using size_type  = typename std::vector<LFU_ELEM>::size_type;
@@ -35,9 +38,14 @@ class LFU final {
         cache_iter min_elem = std::min_element(cache_.begin(), cache_.end(),
                                              [](auto& first, auto& second){return first.hit_count < second.hit_count; });
         
+        std::cerr << "I am going to erase elem\n";
+
         cache_.erase(min_elem);
 
         cache_.emplace_back(key);    
+
+        std::cerr << "SuckSecc\n";
+
     }
 
 public:
