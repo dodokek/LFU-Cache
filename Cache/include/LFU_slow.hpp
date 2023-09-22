@@ -1,16 +1,16 @@
-#ifndef LFU_SLOW
-#define LFU_SLOW
+#ifndef LFU_SLOW_H
+#define LFU_SLOW_H
 
 #include <algorithm>
 #include <utility>
 #include <vector>
 #include <iostream>
 
-namespace LFU_CACHE_SLOW
+namespace LearningCXX
 {
 
 template<typename KeyT, typename PageT>
-class LFU final {
+class LFU_SLOW final {
     
     struct LFU_ELEM
     {
@@ -49,7 +49,7 @@ class LFU final {
     }
 
 public:
-    LFU (size_type capacity) : capacity_(capacity) {
+    LFU_SLOW (size_type capacity) : capacity_(capacity) {
         cache_.reserve(capacity);
     }
 
@@ -113,6 +113,6 @@ public:
     }
 }; 
 
-} // namespace LFU_CACHE
+} // namespace LearningCXX
 
-#endif // #ifdef LFU_SLOW
+#endif // #ifdef LFU_SLOW_H

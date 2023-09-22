@@ -1,16 +1,16 @@
-#ifndef LFU_HASHMAP
-#define LFU_HASHMAP
+#ifndef LFU_HASHMAP_H
+#define LFU_HASHMAP_H
 
 #include <iostream>
 #include <iterator>
 #include <list>
 #include <unordered_map>
 
-namespace LFU_CACHE_FAST
+namespace LearningCXX
 {
 
 template<typename KeyT, typename PageT>
-class LFU final {
+class LFU_FAST final {
     struct LFU_ELEM;
     struct FREQ_NODE;
 
@@ -39,7 +39,7 @@ private:
 
         FREQ_NODE (size_type frequency) : frequency_(frequency) {};
     };
-    
+
     size_type capacity_;
     long int  total_hit_count_ = 0;
     
@@ -47,7 +47,7 @@ private:
     std::list<FREQ_NODE> cache_;
 
 public:
-    LFU (size_type capacity) : capacity_(capacity) {
+    LFU_FAST (size_type capacity) : capacity_(capacity) {
         cache_.emplace_back (1);
     }
 
@@ -121,6 +121,6 @@ public:
     }
 }; 
 
-} // namespace LFU_CACHE
+} // namespace LearningCXX
 
-#endif // #ifdef LFU_HASHMAP
+#endif // #ifdef LFU_HASHMAP_H

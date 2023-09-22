@@ -14,7 +14,7 @@ int main()
         throw std::runtime_error{"Bad input: cache capacity"};
 
     
-    LFU_CACHE_SLOW::LFU<int, int> lfu_instance(cache_capactiy);
+    LearningCXX::LFU_SLOW<int, int> lfu_instance(cache_capactiy);
 
     for (size_t i = 0 ; i < input_size; i++)
     {
